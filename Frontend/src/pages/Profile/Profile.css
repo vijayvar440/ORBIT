@@ -147,3 +147,26 @@ body{
 .profile-stats span:hover{
     color:#1877f2;
 }
+.profile-actions{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:15px;
+}
+
+.message-icon-btn{
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:50%;
+    background:#f2f2f2;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.message-icon-btn:hover{
+    background:#ddd;
+}

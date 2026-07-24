@@ -17,6 +17,8 @@ import ProtectedRoute from "./ProtectedRoute";
 
 import Followers from "./pages/Profile/Followers";
 
+import Chat from "./pages/Chat/Chat";
+
 
 
 function App() {
@@ -34,6 +36,7 @@ function App() {
                 <Route path="/post/:id" element={<SinglePost />} />
                 <Route path="/user/:id" element={<UserProfile />} />
                 <Route path="/followers/:id"element={<Followers />}/>
+                <Route path="/Chat/:usrID" element ={<Chat />} />
 
                 
                 <Route

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "./Profile.css";
 import { useNavigate, useParams } from "react-router-dom";
+import { FiMessageCircle } from "react-icons/fi";
 
 function UserProfile() {
 
@@ -12,38 +13,44 @@ function UserProfile() {
     const [user, setUser] = useState(null);
     const [posts, setPosts] = useState([]);
     const [following, setFollowing] = useState(false);
+    const [isMyProfile, setIsMyProfile] = useState(false);
 
-    const fetchUserProfile = async () => {
+   const fetchUserProfile = async () => {
 
-        try {
-
-            const response = await axios.get(
-                `http://localhost:3000/api/Post/user/${id}`
-            );
-
-            setUser(response.data.user);
-            setPosts(response.data.posts);
-
-            const loggedUserId = localStorage.getItem("userId");
-
-            setFollowing(
-                response.data.user.followers.some((item) => {
-                    return item === loggedUserId || item._id === loggedUserId;
-                })
-            );
-
-        } catch (err) {
-
-            console.log(err.response?.data || err.message);
-
-        }
-
-    };
-
-    const handleFollow = async () => {
     try {
 
-        const response = await axios.put(
+        const response = await axios.get(
+            `http://localhost:3000/api/Post/user/${id}`
+        );
+
+        setUser(response.data.user);
+        setPosts(response.data.posts);
+
+        const loggedUserId = localStorage.getItem("userId");
+
+        setFollowing(
+            response.data.user.followers?.some((item) =>
+                String(item) === loggedUserId ||
+                String(item._id) === loggedUserId
+            )
+        );
+
+        setIsMyProfile(response.data.user._id === loggedUserId);
+
+    } catch (err) {
+
+        console.log(err.response?.data || err.message);
+
+    }
+
+};
+
+
+    const handleFollow = async () => {
+
+    try {
+
+        await axios.put(
             `http://localhost:3000/api/Post/follow/${id}`,
             {},
             {
@@ -53,18 +60,16 @@ function UserProfile() {
             }
         );
 
-        alert(response.data.message);
-
         fetchUserProfile();
-
-        setFollowing(!following);
 
     } catch (err) {
 
         console.log(err.response?.data || err.message);
 
     }
+
 };
+
 
     useEffect(() => {
 
@@ -134,12 +139,45 @@ function UserProfile() {
 
                     </div>
 
+                   
+                  {
+    isMyProfile ? (
+
+        <button
+            className="edit-btn"
+            onClick={() => navigate("/edit-profile")}
+        >
+            Edit Profile
+        </button>
+
+    ) : (
+
+        <div className="profile-actions">
+
+            <button
+                className="edit-btn"
+                onClick={handleFollow}
+            >
+                {following ? "Following" : "Follow"}
+            </button>
+
+            {
+                following && (
+
                     <button
-                         className="edit-btn"
-                         onClick={handleFollow}
-                         >
-                         {following ? "Following" : "Follow"}
-                     </button>
+                        className="message-icon-btn"
+                        onClick={() => navigate(`/chat/${id}`)}
+                    >
+                        <FiMessageCircle size={22} />
+                    </button>
+
+                )
+            }
+
+        </div>
+
+    )
+}
 
                 </div>
 
@@ -148,7 +186,7 @@ function UserProfile() {
             <hr />
 
             <div className="posts-grid">
-                                {posts.map((post) => (
+                    {posts.map((post) => (
 
                     <div
                         className="post-card"
