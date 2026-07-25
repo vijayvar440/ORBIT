@@ -31,12 +31,48 @@ function Chat() {
         }
 
     };
+    const sendMessage = async () => {
 
-    useEffect(() => {
+    if (!text.trim()) return;
+
+    try {
+
+        await axios.post(
+            `http://localhost:3000/api/message/send/${userId}`,
+            {
+                message: text
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            }
+        );
+
+        setText("");
 
         fetchMessages();
 
-    }, []);
+    } catch (err) {
+
+        console.log(err.response?.data || err.message);
+
+    }
+
+};
+ useEffect(() => {
+
+    fetchMessages();
+
+    const interval = setInterval(() => {
+
+        fetchMessages();
+
+    }, 2000);
+
+    return () => clearInterval(interval);
+
+}, [userId]);
 
     return (
         <div>
@@ -62,9 +98,9 @@ function Chat() {
                 placeholder="Type message..."
             />
 
-            <button>
-                Send
-            </button>
+           <button onClick={sendMessage}>
+            Send
+          </button>
 
         </div>
     );
