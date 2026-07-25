@@ -1,4 +1,12 @@
+
 const messageModel = require("../model/message.model");
+
+console.log("Message Model =>", messageModel);
+console.log("Type =>", typeof messageModel);
+console.log("Find =>", messageModel.find);
+
+
+
 const sendMessage = async (req, res) => {
 
     try {

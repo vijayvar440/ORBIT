@@ -36,7 +36,8 @@ function App() {
                 <Route path="/post/:id" element={<SinglePost />} />
                 <Route path="/user/:id" element={<UserProfile />} />
                 <Route path="/followers/:id"element={<Followers />}/>
-                <Route path="/Chat/:usrID" element ={<Chat />} />
+                <Route path="/Chat/:userId" element ={<Chat />} />
+                {/* <Route path="/chat/:userId" element={<Chat />} /> */}
 
                 
                 <Route
