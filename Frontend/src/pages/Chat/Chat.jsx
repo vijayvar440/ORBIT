@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import socket from "../../socket";
 
 function Chat() {
 
@@ -62,17 +63,19 @@ function Chat() {
 };
  useEffect(() => {
 
-    fetchMessages();
+    socket.on("connect", () => {
 
-    const interval = setInterval(() => {
+        console.log("✅ Connected:", socket.id);
 
-        fetchMessages();
+    });
 
-    }, 2000);
+    return () => {
 
-    return () => clearInterval(interval);
+        socket.off("connect");
 
-}, [userId]);
+    };
+
+}, []);
 
     return (
         <div>
