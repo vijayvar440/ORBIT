@@ -32,13 +32,13 @@ function Chat() {
         }
 
     };
-    const sendMessage = async () => {
+   const sendMessage = async () => {
 
     if (!text.trim()) return;
 
     try {
 
-        await axios.post(
+        const response = await axios.post(
             `http://localhost:3000/api/message/send/${userId}`,
             {
                 message: text
@@ -50,9 +50,17 @@ function Chat() {
             }
         );
 
-        setText("");
+        socket.emit("send_message", {
 
-        fetchMessages();
+            ...response.data.newMessage,
+
+            receiver: userId
+
+        });
+
+        setMessages((prev) => [...prev, response.data.newMessage]);
+
+        setText("");
 
     } catch (err) {
 
@@ -61,21 +69,30 @@ function Chat() {
     }
 
 };
- useEffect(() => {
+useEffect(() => {
+
+    socket.emit("join", localStorage.getItem("userId"));
 
     socket.on("connect", () => {
-
         console.log("✅ Connected:", socket.id);
+    });
+
+    socket.on("receive_message", (newMessage) => {
+
+        setMessages((prev) => [...prev, newMessage]);
 
     });
 
+    fetchMessages();
+
     return () => {
 
+        socket.off("receive_message");
         socket.off("connect");
 
     };
 
-}, []);
+}, [userId]);
 
     return (
         <div>
