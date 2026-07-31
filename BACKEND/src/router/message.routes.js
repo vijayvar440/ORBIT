@@ -15,5 +15,10 @@ router.get(
     authMiddleware,
     messageController.getMessages
 );
+router.get(
+    "/inbox",
+    authMiddleware,
+    messageController.getInbox
+);
 
 module.exports = router;

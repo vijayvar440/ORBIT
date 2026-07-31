@@ -1,9 +1,8 @@
 
 const messageModel = require("../model/message.model");
 
-console.log("Message Model =>", messageModel);
-console.log("Type =>", typeof messageModel);
-console.log("Find =>", messageModel.find);
+const User = require("../model/user.model");
+
 
 
 
@@ -83,7 +82,63 @@ const getMessages = async (req, res) => {
     }
 
 };
+
+
+const getInbox = async (req, res) => {
+
+    try {
+
+        const myId = req.user.id;
+
+        const messages = await messageModel.find({
+
+            $or: [
+                { sender: myId },
+                { receiver: myId }
+            ]
+
+        }).sort({ createdAt: -1 });
+
+        const users = {};
+
+        for (let msg of messages) {
+
+            const otherUser =
+                String(msg.sender) === myId
+                    ? String(msg.receiver)
+                    : String(msg.sender);
+
+            if (!users[otherUser]) {
+
+                const user = await User.findById(otherUser);
+
+                users[otherUser] = {
+
+                    user,
+                    lastMessage: msg.message,
+                    time: msg.createdAt
+
+                };
+
+            }
+
+        }
+
+        res.json(Object.values(users));
+
+    } catch (err) {
+
+        console.log(err);
+
+        res.status(500).json({
+            message: err.message
+        });
+
+    }
+
+};
 module.exports = {
     sendMessage,
-    getMessages
+    getMessages,
+    getInbox
 };
