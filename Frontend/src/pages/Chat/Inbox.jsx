@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Inbox.css";
+import socket from "../../socket";
 
 function Inbox() {
 
     const navigate = useNavigate();
 
     const [chats, setChats] = useState([]);
+    const [onlineUsers, setOnlineUsers] = useState([]);
 
     const fetchInbox = async () => {
 
@@ -34,9 +36,19 @@ function Inbox() {
 
     useEffect(() => {
 
-        fetchInbox();
+    socket.emit("join", localStorage.getItem("userId"));
 
-    }, []);
+    socket.on("online-users", (users) => {
+        setOnlineUsers(users);
+    });
+
+    fetchInbox();
+
+    return () => {
+        socket.off("online-users");
+    };
+
+}, []);
 
     return (
 
@@ -70,6 +82,18 @@ function Inbox() {
                             <div className="chat-info">
 
                                 <h3>{chat.user.username}</h3>
+                                <p
+                                    style={{
+                                        color: onlineUsers.includes(chat.user._id)
+                                            ? "green"
+                                            : "gray",
+                                        fontSize: "13px"
+                                    }}
+                                >
+                                    {onlineUsers.includes(chat.user._id)
+                                        ? "🟢 Online"
+                                        : "⚫ Offline"}
+                                </p>
 
                                 <p>{chat.lastMessage}</p>
 

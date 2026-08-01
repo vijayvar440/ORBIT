@@ -17,12 +17,33 @@ const io = new Server(server, {
     }
 });
 
+const users = {};
+
 io.on("connection", (socket) => {
 
     console.log("🟢 User Connected:", socket.id);
 
+    socket.on("join", (userId) => {
+
+        users[userId] = socket.id;
+
+        io.emit("online-users", Object.keys(users));
+
+    });
+
     socket.on("disconnect", () => {
+
+        for (let id in users) {
+            if (users[id] === socket.id) {
+                delete users[id];
+                break;
+            }
+        }
+
+        io.emit("online-users", Object.keys(users));
+
         console.log("🔴 User Disconnected:", socket.id);
+
     });
 
 });

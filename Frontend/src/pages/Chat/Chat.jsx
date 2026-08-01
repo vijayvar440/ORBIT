@@ -13,6 +13,9 @@ function Chat() {
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState("");
     const messagesEndRef = useRef(null);
+    const [onlineUsers, setOnlineUsers] = useState([]);
+    const [user, setUser] = useState(null);
+    const [online, setOnline] = useState(false);  
 
     const fetchMessages = async () => {
 
@@ -73,22 +76,48 @@ function Chat() {
     }
 
 };
+const fetchUser = async () => {
+
+    try {
+
+        const response = await axios.get(
+            `http://localhost:3000/api/Post/user/${userId}`
+        );
+
+        setUser(response.data.user);
+
+    } catch (err) {
+
+        console.log(err.response?.data || err.message);
+
+    }
+
+};
 useEffect(() => {
 
     socket.emit("join", localStorage.getItem("userId"));
 
     socket.on("connect", () => {
-        console.log("✅ Connected:", socket.id);
+        console.log("Connected");
     });
 
     socket.on("receive_message", (newMessage) => {
         setMessages((prev) => [...prev, newMessage]);
     });
 
+    socket.on("online-users", (users) => {
+
+        setOnlineUsers(users);
+        setOnline(users.includes(userId));
+
+    });
+
     fetchMessages();
+    fetchUser();
 
     return () => {
         socket.off("receive_message");
+        socket.off("online-users");
         socket.off("connect");
     };
 
@@ -98,7 +127,7 @@ useEffect(() => {
 useEffect(() => {
 
     messagesEndRef.current?.scrollIntoView({
-        behavior: "smooth"
+        behavior: "smooth",
     });
 
 }, [messages]);
@@ -106,9 +135,28 @@ useEffect(() => {
 return (
     <div className="chat-container">
 
-        <div className="chat-header">
-            <h2>💬 Chat</h2>
-        </div>
+       <div className="chat-header">
+          
+              <img
+                  src={
+                      user?.profileImage ||
+                      "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                  }
+                  alt=""
+                  className="chat-avatar"
+              />
+          
+              <div>
+          
+                  <h3>{user?.username}</h3>
+          
+                  <p className={online ? "online" : "offline"}>
+                      {online ? "🟢 Online" : "⚫ Offline"}
+                  </p>
+          
+              </div>
+          
+          </div>
 
         <div className="chat-body">
 
