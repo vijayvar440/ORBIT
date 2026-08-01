@@ -11,14 +11,15 @@ router.post(
 );
 
 router.get(
-    "/:userId",
-    authMiddleware,
-    messageController.getMessages
-);
-router.get(
     "/inbox",
     authMiddleware,
     messageController.getInbox
+);
+
+router.get(
+    "/:userId",
+    authMiddleware,
+    messageController.getMessages
 );
 
 module.exports = router;

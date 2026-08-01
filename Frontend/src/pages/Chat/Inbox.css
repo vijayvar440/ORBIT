@@ -1,0 +1,39 @@
+.inbox-container{
+    max-width:600px;
+    margin:30px auto;
+    background:#fff;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+.chat-card{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:12px;
+    border-bottom:1px solid #eee;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.chat-card:hover{
+    background:#f5f5f5;
+}
+
+.chat-card img{
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.chat-info h3{
+    margin:0;
+    font-size:17px;
+}
+
+.chat-info p{
+    margin-top:5px;
+    color:#666;
+}

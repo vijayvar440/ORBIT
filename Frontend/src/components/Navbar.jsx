@@ -6,6 +6,7 @@ import {
     Search,
     SquarePlus,
     CircleUserRound,
+    MessageCircle,
     LogOut
 } from "lucide-react";
 
@@ -108,27 +109,32 @@ function Navbar() {
 
             <div className="nav-menu">
 
-                <Link to="/">
-                    <House size={22}/>
-                    <span>Home</span>
-                </Link>
+    <Link to="/">
+        <House size={22}/>
+        <span>Home</span>
+    </Link>
 
-                <Link to="/create-post">
-                    <SquarePlus size={22}/>
-                    <span>Create</span>
-                </Link>
+    <Link to="/create-post">
+        <SquarePlus size={22}/>
+        <span>Create</span>
+    </Link>
 
-                <Link to="/profile">
-                    <CircleUserRound size={22}/>
-                    <span>Profile</span>
-                </Link>
+    <Link to="/messages">
+        <MessageCircle size={22}/>
+        <span>Messages</span>
+    </Link>
 
-                <button onClick={logout}>
-                    <LogOut size={20}/>
-                    Logout
-                </button>
+    <Link to="/profile">
+        <CircleUserRound size={22}/>
+        <span>Profile</span>
+    </Link>
 
-            </div>
+    <button onClick={logout}>
+        <LogOut size={20}/>
+        Logout
+    </button>
+
+</div>
 
         </nav>
 
