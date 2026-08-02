@@ -45,6 +45,40 @@ io.on("connection", (socket) => {
         console.log("🔴 User Disconnected:", socket.id);
 
     });
+        socket.on("typing", ({ sender, receiver }) => {
+    
+        const receiverSocket = users[receiver];
+    
+        if (receiverSocket) {
+    
+            io.to(receiverSocket).emit("typing", sender);
+    
+        }
+    
+    });
+    
+    socket.on("stop_typing", ({ sender, receiver }) => {
+    
+        const receiverSocket = users[receiver];
+    
+        if (receiverSocket) {
+    
+            io.to(receiverSocket).emit("stop_typing", sender);
+    
+        }
+    
+    });
+    socket.on("send_message", (data) => {
+
+    const receiverSocket = users[data.receiver];
+
+    if (receiverSocket) {
+
+        io.to(receiverSocket).emit("receive_message", data);
+
+    }
+
+    });
 
 });
 

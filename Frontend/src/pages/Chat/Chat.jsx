@@ -13,9 +13,11 @@ function Chat() {
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState("");
     const messagesEndRef = useRef(null);
-    const [onlineUsers, setOnlineUsers] = useState([]);
+    
     const [user, setUser] = useState(null);
-    const [online, setOnline] = useState(false);  
+    const [online, setOnline] = useState(false);
+    const [typing, setTyping] = useState(false);
+    
 
     const fetchMessages = async () => {
 
@@ -66,6 +68,13 @@ function Chat() {
         });
 
         setMessages((prev) => [...prev, response.data.newMessage]);
+        socket.emit("stop_typing", {
+
+           sender: localStorage.getItem("userId"),
+       
+           receiver: userId
+       
+       });
 
         setText("");
 
@@ -93,6 +102,18 @@ const fetchUser = async () => {
     }
 
 };
+const formatLastSeen = (date) => {
+
+    if (!date) return "";
+
+    return new Date(date).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+
+};
 useEffect(() => {
 
     socket.emit("join", localStorage.getItem("userId"));
@@ -107,18 +128,30 @@ useEffect(() => {
 
     socket.on("online-users", (users) => {
 
-        setOnlineUsers(users);
         setOnline(users.includes(userId));
+        fetchUser();
 
+    });
+
+    socket.on("typing", () => {
+        setTyping(true);
+    });
+
+    socket.on("stop_typing", () => {
+        setTyping(false);
     });
 
     fetchMessages();
     fetchUser();
 
     return () => {
+
         socket.off("receive_message");
         socket.off("online-users");
+        socket.off("typing");
+        socket.off("stop_typing");
         socket.off("connect");
+
     };
 
 }, [userId]);
@@ -150,52 +183,77 @@ return (
           
                   <h3>{user?.username}</h3>
           
-                  <p className={online ? "online" : "offline"}>
-                      {online ? "🟢 Online" : "⚫ Offline"}
-                  </p>
-          
+                 <p className={online ? "online" : "offline"}>
+                        {online
+                            ? "🟢 Online"
+                            : `Last seen ${formatLastSeen(user?.lastSeen)}`}
+                    </p>
               </div>
           
           </div>
 
-        <div className="chat-body">
+       <div className="chat-body">
 
-            {messages.map((msg) => (
+    {messages.map((msg) => (
 
-                <div
-                    key={msg._id}
-                    className={
-                        String(msg.sender) === localStorage.getItem("userId")
-                            ? "my-message"
-                            : "other-message"
-                    }
-                >
+        <div
+            key={msg._id}
+            className={
+                String(msg.sender) === localStorage.getItem("userId")
+                    ? "my-message"
+                    : "other-message"
+            }
+        >
 
-                    <div className="message-box">
-                        {msg.message}
-                    </div>
+            <div className="message-box">
 
-                </div>
+                <p>{msg.message}</p>
 
-            ))}
+                <span className="message-time">
+                    {new Date(msg.createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })}
+                </span>
 
-            <div ref={messagesEndRef}></div>
+            </div>
 
         </div>
 
+    ))}
+
+    {typing && (
+        <div className="typing-text">
+            ✍️ {user?.username} is typing...
+        </div>
+    )}
+
+    <div ref={messagesEndRef}></div>
+
+</div>
+
         <div className="chat-footer">
 
-            <input
-                type="text"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Type message..."
-                onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                        sendMessage();
-                    }
-                }}
-            />
+           <input
+    type="text"
+    value={text}
+    onChange={(e) => {
+
+        setText(e.target.value);
+
+        socket.emit("typing", {
+            sender: localStorage.getItem("userId"),
+            receiver: userId,
+        });
+
+    }}
+    placeholder="Type message..."
+    onKeyDown={(e) => {
+        if (e.key === "Enter") {
+            sendMessage();
+        }
+    }}
+/>
 
             <button onClick={sendMessage}>
                 ➤

@@ -5,30 +5,37 @@ const User = require("../model/user.model");
 
 
 
-
 const sendMessage = async (req, res) => {
 
     try {
 
         const sender = req.user.id;
         const receiver = req.params.userId;
+
         const { message } = req.body;
 
-        if (!message) {
+        const image = req.file ? req.file.path : "";
+
+        if (!message && !image) {
             return res.status(400).json({
-                message: "Message is required"
+                message: "Message or Image is required"
             });
         }
 
         const newMessage = await messageModel.create({
+
             sender,
             receiver,
-            message
+            message,
+            image
+
         });
 
         return res.status(201).json({
+
             message: "Message Sent Successfully",
             newMessage
+
         });
 
     } catch (err) {

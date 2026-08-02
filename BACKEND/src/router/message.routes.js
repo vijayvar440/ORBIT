@@ -4,9 +4,13 @@ const router = express.Router();
 const authMiddleware = require("../middlewares/auth.Middlewares");
 const messageController = require("../controller/message.controller");
 
+const upload = require("../middlewares/chatUpload");
+
+// Send Text + Image
 router.post(
     "/send/:userId",
     authMiddleware,
+    upload.single("image"),
     messageController.sendMessage
 );
 
