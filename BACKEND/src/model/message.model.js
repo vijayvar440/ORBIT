@@ -1,31 +1,40 @@
 const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema(
-  {
+{
     sender: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user"
     },
+
     receiver: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user"
     },
+
     message: {
-      type: String,
-      required: true,
+        type: String,
+        default: ""
     },
+
     image: {
-    type: String,
-    default: ""
+        type: String,
+        default: ""
+    },
+
+    video: {
+        type: String,
+        default: ""
+    },
+
+    file: {
+        type: String,
+        default: ""
+    }
+
 },
-  },
-  {
-    timestamps: true,
-  }
-);
+{
+    timestamps: true
+});
 
-const messageModel = mongoose.model("message", messageSchema);
-
-module.exports = messageModel;
+module.exports = mongoose.model("message", messageSchema);

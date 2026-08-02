@@ -17,6 +17,7 @@ function Chat() {
     const [user, setUser] = useState(null);
     const [online, setOnline] = useState(false);
     const [typing, setTyping] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
     
 
     const fetchMessages = async () => {
@@ -43,21 +44,27 @@ function Chat() {
     };
    const sendMessage = async () => {
 
-    if (!text.trim()) return;
+    if (!text.trim() && !selectedFile) return;
 
     try {
 
-        const response = await axios.post(
-            `http://localhost:3000/api/message/send/${userId}`,
-            {
-                message: text
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            }
-        );
+       const formData = new FormData();
+
+         formData.append("message", text);
+         
+         if (selectedFile) {
+             formData.append("file", selectedFile);
+         }
+         
+         const response = await axios.post(
+             `http://localhost:3000/api/message/send/${userId}`,
+             formData,
+             {
+                 headers: {
+                     Authorization: `Bearer ${localStorage.getItem("token")}`,
+                 }
+             }
+         );
 
         socket.emit("send_message", {
 
@@ -77,6 +84,8 @@ function Chat() {
        });
 
         setText("");
+        setSelectedFile(null);
+
 
     } catch (err) {
 
@@ -205,18 +214,44 @@ return (
             }
         >
 
-            <div className="message-box">
+           <div className="message-box">
 
-                <p>{msg.message}</p>
+    {msg.image && (
+        <img
+            src={msg.image}
+            alt="chat"
+            className="chat-image"
+        />
+    )}
 
-                <span className="message-time">
-                    {new Date(msg.createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    })}
-                </span>
+    {msg.video && (
+        <video controls className="chat-video">
+            <source src={msg.video} />
+        </video>
+    )}
 
-            </div>
+    {msg.file && (
+        <a
+            href={msg.file}
+            target="_blank"
+            rel="noreferrer"
+        >
+            📄 Download File
+        </a>
+    )}
+
+    {msg.message && (
+        <p>{msg.message}</p>
+    )}
+
+    <span className="message-time">
+        {new Date(msg.createdAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+        })}
+    </span>
+
+</div>
 
         </div>
 
@@ -232,34 +267,45 @@ return (
 
 </div>
 
-        <div className="chat-footer">
+       <div className="chat-footer">
 
-           <input
-    type="text"
-    value={text}
-    onChange={(e) => {
+    <input
+        type="file"
+        id="file"
+        hidden
+        onChange={(e) => setSelectedFile(e.target.files[0])}
+    />
 
-        setText(e.target.value);
+    <label htmlFor="file" className="file-btn">
+        📎
+    </label>
 
-        socket.emit("typing", {
-            sender: localStorage.getItem("userId"),
-            receiver: userId,
-        });
+    <input
+        type="text"
+        value={text}
+        onChange={(e) => {
 
-    }}
-    placeholder="Type message..."
-    onKeyDown={(e) => {
-        if (e.key === "Enter") {
-            sendMessage();
-        }
-    }}
-/>
+            setText(e.target.value);
 
-            <button onClick={sendMessage}>
-                ➤
-            </button>
+            socket.emit("typing", {
+                sender: localStorage.getItem("userId"),
+                receiver: userId,
+            });
 
-        </div>
+        }}
+        placeholder="Type message..."
+        onKeyDown={(e) => {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        }}
+    />
+
+    <button onClick={sendMessage}>
+        ➤
+    </button>
+
+</div>
 
     </div>
 );

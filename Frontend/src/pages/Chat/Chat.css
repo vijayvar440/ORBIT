@@ -171,3 +171,16 @@
     margin-top:5px;
     font-style:italic;
 }
+.chat-image{
+    width:220px;
+    max-width:100%;
+    border-radius:12px;
+    margin-bottom:8px;
+}
+
+.chat-video{
+    width:250px;
+    max-width:100%;
+    border-radius:12px;
+    margin-bottom:8px;
+}

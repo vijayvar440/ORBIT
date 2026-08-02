@@ -1,19 +1,18 @@
 const express = require("express");
 const router = express.Router();
-
+const upload = require("../middlewares/chatUpload");
 const authMiddleware = require("../middlewares/auth.Middlewares");
 const messageController = require("../controller/message.controller");
 
-const upload = require("../middlewares/chatUpload");
+
 
 // Send Text + Image
 router.post(
     "/send/:userId",
     authMiddleware,
-    upload.single("image"),
+    upload.single("file"),
     messageController.sendMessage
 );
-
 router.get(
     "/inbox",
     authMiddleware,

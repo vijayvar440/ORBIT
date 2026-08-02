@@ -4,12 +4,21 @@ const cloudinary = require("../config/cloudinary");
 
 const storage = new CloudinaryStorage({
     cloudinary,
-    params: {
-        folder: "chat-images",
-        allowed_formats: ["jpg", "jpeg", "png", "webp"]
-    }
+    params: async (req, file) => {
+
+        let folder = "chat";
+
+        let resource_type = "auto";
+
+        return {
+            folder,
+            resource_type,
+        };
+    },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+    storage,
+});
 
 module.exports = upload;

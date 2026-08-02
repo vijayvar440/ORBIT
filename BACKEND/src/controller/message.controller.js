@@ -14,12 +14,34 @@ const sendMessage = async (req, res) => {
 
         const { message } = req.body;
 
-        const image = req.file ? req.file.path : "";
+        let image = "";
+        let video = "";
+        let file = "";
 
-        if (!message && !image) {
+        if (req.file) {
+
+            if (req.file.mimetype.startsWith("image")) {
+
+                image = req.file.path;
+
+            } else if (req.file.mimetype.startsWith("video")) {
+
+                video = req.file.path;
+
+            } else {
+
+                file = req.file.path;
+
+            }
+
+        }
+
+        if (!message && !image && !video && !file) {
+
             return res.status(400).json({
-                message: "Message or Image is required"
+                message: "Message or Attachment is required"
             });
+
         }
 
         const newMessage = await messageModel.create({
@@ -27,7 +49,9 @@ const sendMessage = async (req, res) => {
             sender,
             receiver,
             message,
-            image
+            image,
+            video,
+            file
 
         });
 
@@ -43,7 +67,9 @@ const sendMessage = async (req, res) => {
         console.log(err);
 
         return res.status(500).json({
+
             message: err.message
+
         });
 
     }
