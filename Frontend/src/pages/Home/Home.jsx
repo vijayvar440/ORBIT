@@ -422,7 +422,7 @@ const handleFollow = async (userId) => {
 
                             </div>
 
-                            {/* Comment Input */}
+                        
 
                             <div className="comment-input-area">
 

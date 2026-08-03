@@ -7,17 +7,20 @@ import "./Chat.css";
 
 
 function Chat() {
+   
 
     const { userId } = useParams();
 
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState("");
     const messagesEndRef = useRef(null);
+     const typingTimeout = useRef(null);
     
     const [user, setUser] = useState(null);
     const [online, setOnline] = useState(false);
     const [typing, setTyping] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
+    const [preview, setPreview] = useState("");
     
 
     const fetchMessages = async () => {
@@ -75,16 +78,20 @@ function Chat() {
         });
 
         setMessages((prev) => [...prev, response.data.newMessage]);
-        socket.emit("stop_typing", {
-
-           sender: localStorage.getItem("userId"),
+      
        
-           receiver: userId
        
-       });
 
-        setText("");
-        setSelectedFile(null);
+       setText("");
+setSelectedFile(null);
+setPreview("");
+
+clearTimeout(typingTimeout.current);
+
+socket.emit("stop_typing", {
+    sender: localStorage.getItem("userId"),
+    receiver: userId,
+});
 
 
     } catch (err) {
@@ -267,14 +274,25 @@ return (
 
 </div>
 
+
        <div className="chat-footer">
 
-    <input
-        type="file"
-        id="file"
-        hidden
-        onChange={(e) => setSelectedFile(e.target.files[0])}
-    />
+   <input
+    type="file"
+    id="file"
+    hidden
+    onChange={(e) => {
+
+        const file = e.target.files[0];
+
+        setSelectedFile(file);
+
+        if(file){
+            setPreview(URL.createObjectURL(file));
+        }
+
+    }}
+/>
 
     <label htmlFor="file" className="file-btn">
         📎
@@ -285,14 +303,39 @@ return (
         value={text}
         onChange={(e) => {
 
-            setText(e.target.value);
+    const value = e.target.value;
 
-            socket.emit("typing", {
-                sender: localStorage.getItem("userId"),
-                receiver: userId,
-            });
+    setText(value);
 
-        }}
+    if (value === "") {
+
+    socket.emit("stop_typing", {
+        sender: localStorage.getItem("userId"),
+        receiver: userId,
+    });
+
+    clearTimeout(typingTimeout.current);
+
+    return;
+}
+
+    socket.emit("typing", {
+        sender: localStorage.getItem("userId"),
+        receiver: userId,
+    });
+
+    clearTimeout(typingTimeout.current);
+
+    typingTimeout.current = setTimeout(() => {
+
+        socket.emit("stop_typing", {
+            sender: localStorage.getItem("userId"),
+            receiver: userId,
+        });
+
+    }, 1000);
+
+}}
         placeholder="Type message..."
         onKeyDown={(e) => {
             if (e.key === "Enter") {
