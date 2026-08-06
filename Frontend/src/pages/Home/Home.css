@@ -331,3 +331,101 @@ hr{
 .following-btn:hover{
     background:#d8dade;
 }
+
+@media (max-width:768px){
+
+.home-container{
+    padding:12px;
+}
+
+.feed{
+    width:100%;
+}
+
+.post{
+    padding:18px;
+}
+
+.profile{
+    width:50px;
+    height:50px;
+}
+
+.user h3{
+    font-size:18px;
+}
+
+.post h2{
+    font-size:20px;
+}
+
+.comment-input-area{
+    flex-direction:column;
+}
+
+.comment-input-area button{
+    width:100%;
+}
+
+.actions{
+    justify-content:flex-start;
+    gap:8px;
+}
+
+}
+
+@media (max-width:480px){
+
+.home-container{
+    padding:8px;
+}
+
+.post{
+    padding:15px;
+    border-radius:12px;
+}
+
+.post-header{
+    gap:10px;
+}
+
+.profile{
+    width:45px;
+    height:45px;
+}
+
+.user h3{
+    font-size:16px;
+}
+
+.user span{
+    font-size:12px;
+}
+
+.post h2{
+    font-size:18px;
+}
+
+.post p{
+    font-size:14px;
+}
+
+.actions button{
+    padding:8px 14px;
+    font-size:13px;
+}
+
+.comment-input-area{
+    flex-direction:column;
+}
+
+.comment-input-area button{
+    width:100%;
+}
+
+.follow-btn{
+    padding:7px 12px;
+    font-size:13px;
+}
+
+}

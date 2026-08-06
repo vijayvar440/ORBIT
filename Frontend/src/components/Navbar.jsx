@@ -51,11 +51,11 @@ function Navbar() {
 
         <nav className="navbar">
 
-            <div className="logo">
-                SocialApp
-            </div>
+         <Link to="/" className="logo">
+            SocialApp
+        </Link>
 
-            {/* Search Box */}
+            
 <div className="search">
 
     <Search size={18} />

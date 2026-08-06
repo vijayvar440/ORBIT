@@ -181,3 +181,111 @@
     color: gray;
     font-size: 12px;
 }
+/* ==========================
+   RESPONSIVE NAVBAR
+========================== */
+
+@media (max-width:1024px){
+
+    .navbar{
+        padding:0 25px;
+    }
+
+    .search{
+        width:250px;
+    }
+
+    .logo{
+        font-size:26px;
+    }
+
+    .nav-menu{
+        gap:10px;
+    }
+
+    .nav-menu a{
+        padding:10px 12px;
+        font-size:14px;
+    }
+
+    .nav-menu button{
+        padding:10px 16px;
+        font-size:14px;
+    }
+
+}
+
+@media (max-width:768px){
+
+    .navbar{
+        padding:10px 15px;
+        height:auto;
+        flex-wrap:wrap;
+        gap:12px;
+    }
+
+    .logo{
+        width:100%;
+        text-align:center;
+        font-size:24px;
+    }
+
+    .search{
+        width:100%;
+        order:2;
+    }
+
+    .nav-menu{
+        width:100%;
+        justify-content:center;
+        flex-wrap:wrap;
+        order:3;
+    }
+
+    .nav-menu a,
+    .nav-menu button{
+        flex:1;
+        justify-content:center;
+        min-width:110px;
+    }
+
+}
+
+@media (max-width:480px){
+
+    .navbar{
+        padding:10px;
+    }
+
+    .logo{
+        font-size:22px;
+    }
+
+    .search{
+        padding:10px 15px;
+    }
+
+    .search input{
+        font-size:14px;
+    }
+
+    .nav-menu{
+        gap:8px;
+    }
+
+    .nav-menu a{
+        font-size:13px;
+        padding:9px;
+    }
+
+    .nav-menu button{
+        font-size:13px;
+        padding:9px;
+    }
+
+    .search-user img{
+        width:40px;
+        height:40px;
+    }
+
+}

@@ -149,26 +149,31 @@ useEffect(() => {
 
     });
 
-    socket.on("typing", () => {
-        setTyping(true);
-    });
+   const handleTyping = () => {
+    setTyping(true);
+};
 
-    socket.on("stop_typing", () => {
-        setTyping(false);
-    });
+const handleStopTyping = () => {
+    setTyping(false);
+};
+
+socket.on("typing", handleTyping);
+socket.on("stop_typing", handleStopTyping);
 
     fetchMessages();
     fetchUser();
 
+    
+
     return () => {
+    socket.off("receive_message");
+    socket.off("online-users");
+    socket.off("typing", handleTyping);
+    socket.off("stop_typing", handleStopTyping);
+    socket.off("connect");
+};
 
-        socket.off("receive_message");
-        socket.off("online-users");
-        socket.off("typing");
-        socket.off("stop_typing");
-        socket.off("connect");
 
-    };
 
 }, [userId]);
 
@@ -180,6 +185,11 @@ useEffect(() => {
     });
 
 }, [messages]);
+useEffect(() => {
+    return () => {
+        clearTimeout(typingTimeout.current);
+    };
+}, []);
 
 return (
     <div className="chat-container">
@@ -307,7 +317,7 @@ return (
 
     setText(value);
 
-    if (value === "") {
+    if (value.trim() === "") {
 
     clearTimeout(typingTimeout.current);
 
@@ -317,6 +327,7 @@ return (
     });
 
     return;
+
 }
 
     socket.emit("typing", {
