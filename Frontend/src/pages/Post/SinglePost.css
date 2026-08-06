@@ -1,20 +1,63 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
 body{
+    font-family:"Segoe UI",sans-serif;
     background:#eef2f7;
 }
+
+/* Container */
 
 .single-post-container{
     display:flex;
     justify-content:center;
-    padding:40px;
+    padding:25px 15px;
 }
 
+/* Card */
+
 .single-post-card{
-    width:700px;
-    background:white;
-    border-radius:15px;
+    width:100%;
+    max-width:750px;
+    background:#fff;
+    border-radius:18px;
     overflow:hidden;
-    box-shadow:0 8px 25px rgba(0,0,0,.1);
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
 }
+
+/* Back Button */
+
+.back-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+
+    margin:18px;
+
+    padding:10px 18px;
+
+    border:none;
+    border-radius:10px;
+
+    background:#2563eb;
+    color:#fff;
+
+    font-size:15px;
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.back-btn:hover{
+    background:#1d4ed8;
+}
+
+/* Header */
 
 .single-post-header{
     padding:20px;
@@ -22,28 +65,42 @@ body{
 
 .user-info{
     display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+}
+
+.user-info-left{
+    display:flex;
     align-items:center;
     gap:15px;
 }
 
 .avatar{
-    width:55px;
-    height:55px;
+    width:60px;
+    height:60px;
     border-radius:50%;
     overflow:hidden;
-    background:#1877f2;
-    color:white;
+    background:#2563eb;
+
     display:flex;
     justify-content:center;
     align-items:center;
-    font-size:22px;
-    font-weight:bold;
+
+    color:#fff;
+    font-size:24px;
+    font-weight:700;
 }
 
-
+.single-profile-img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
 
 .user-details h3{
-    margin:0;
+    font-size:20px;
+    margin-bottom:4px;
 }
 
 .user-details span{
@@ -51,36 +108,59 @@ body{
     font-size:13px;
 }
 
+/* Title */
+
 .post-title{
     padding:0 20px;
 }
 
+.post-title h2{
+    font-size:28px;
+    margin-bottom:10px;
+}
+
+/* Description */
+
 .post-description{
     padding:0 20px 20px;
     color:#555;
+    line-height:1.7;
+    font-size:15px;
 }
 
-.single-post-image{
-    width:100%;
-}
+/* Media */
 
+.single-post-image,
 .single-post-video{
     width:100%;
+    display:block;
+    max-height:650px;
+    object-fit:cover;
 }
 
 .single-post-audio{
-    width:95%;
-    margin:20px;
+    width:94%;
+    margin:18px auto;
+    display:block;
 }
 
+/* Stats */
+
 .post-stats{
+    display:flex;
+    gap:25px;
     padding:20px;
-    font-size:18px;
-    font-weight:bold;
+    font-size:16px;
+    font-weight:600;
+    border-top:1px solid #eee;
 }
+
+/* Comments */
 
 .comment-heading{
     padding:0 20px;
+    font-size:20px;
+    font-weight:700;
 }
 
 .comment-section{
@@ -88,39 +168,101 @@ body{
 }
 
 .comment-card{
-    background:#f5f5f5;
-    border-radius:10px;
-    padding:12px;
-    margin-bottom:10px;
+    background:#f8f9fb;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:12px;
+    transition:.3s;
 }
-.single-profile-img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    border-radius:50%;
+
+.comment-card:hover{
+    background:#f0f3f8;
 }
-.back-btn{
-    display:inline-flex;
-    align-items:center;
 
-    width:fit-content;
+/* Tablet */
 
-    margin:15px 0 0 15px;
+@media(max-width:768px){
 
-    padding:6px 12px;
+.single-post-card{
+    border-radius:14px;
+}
 
-    border:none;
-    border-radius:6px;
+.user-details h3{
+    font-size:18px;
+}
 
-    background:#1877f2;
-    color:#fff;
+.post-title h2{
+    font-size:24px;
+}
 
+.post-description{
     font-size:14px;
-    font-weight:600;
-
-    cursor:pointer;
 }
 
-.back-btn:hover{
-    background:#1565c0;
+}
+
+/* Mobile */
+
+@media(max-width:480px){
+
+.single-post-container{
+    padding:10px;
+}
+
+.single-post-card{
+    border-radius:12px;
+}
+
+.single-post-header{
+    padding:15px;
+}
+
+.avatar{
+    width:48px;
+    height:48px;
+}
+
+.user-details h3{
+    font-size:16px;
+}
+
+.user-details span{
+    font-size:12px;
+}
+
+.post-title{
+    padding:0 15px;
+}
+
+.post-title h2{
+    font-size:20px;
+}
+
+.post-description{
+    padding:0 15px 15px;
+    font-size:14px;
+}
+
+.post-stats{
+    flex-wrap:wrap;
+    gap:15px;
+    padding:15px;
+    font-size:14px;
+}
+
+.comment-heading{
+    padding:0 15px;
+    font-size:18px;
+}
+
+.comment-section{
+    padding:15px;
+}
+
+.back-btn{
+    margin:12px;
+    width:calc(100% - 24px);
+    justify-content:center;
+}
+
 }

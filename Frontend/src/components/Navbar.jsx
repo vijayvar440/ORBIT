@@ -51,9 +51,9 @@ function Navbar() {
 
         <nav className="navbar">
 
-         <Link to="/" className="logo">
-            SocialApp
-        </Link>
+        <div className="logo">
+    Orbit<span>.</span>
+</div>
 
             
 <div className="search">
