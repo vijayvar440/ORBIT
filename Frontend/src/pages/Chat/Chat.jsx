@@ -309,12 +309,12 @@ return (
 
     if (value === "") {
 
+    clearTimeout(typingTimeout.current);
+
     socket.emit("stop_typing", {
         sender: localStorage.getItem("userId"),
         receiver: userId,
     });
-
-    clearTimeout(typingTimeout.current);
 
     return;
 }
