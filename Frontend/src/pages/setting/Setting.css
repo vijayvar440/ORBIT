@@ -1,0 +1,204 @@
+.settings-container {
+    min-height: calc(100vh - 75px);
+    padding: 40px 20px;
+
+    background:
+        radial-gradient(circle at top left, #172554 0%, transparent 35%),
+        radial-gradient(circle at bottom right, #312e81 0%, transparent 35%),
+        #070b14;
+
+    color: #fff;
+
+    display: flex;
+    justify-content: center;
+}
+
+
+.settings-card {
+    width: 100%;
+    max-width: 720px;
+
+    background: rgba(17, 24, 39, 0.88);
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    border-radius: 22px;
+
+    padding: 30px;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+
+    backdrop-filter: blur(15px);
+}
+
+
+.settings-card h1 {
+    margin: 0;
+
+    font-size: 30px;
+}
+
+
+.settings-subtitle {
+    color: #94a3b8;
+
+    margin-top: 7px;
+}
+
+
+.settings-section {
+    margin-top: 30px;
+
+    padding: 22px;
+
+    background: rgba(255, 255, 255, 0.04);
+
+    border: 1px solid rgba(255, 255, 255, 0.07);
+
+    border-radius: 16px;
+}
+
+
+.settings-section h2 {
+    margin: 0 0 20px;
+
+    font-size: 18px;
+}
+
+
+.setting-item {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+.setting-info h3 {
+    margin: 0 0 5px;
+
+    font-size: 16px;
+}
+
+
+.setting-info p {
+    margin: 0;
+
+    color: #94a3b8;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+/* TOGGLE */
+
+.privacy-toggle {
+    width: 54px;
+    height: 30px;
+
+    border: none;
+
+    border-radius: 30px;
+
+    background: #334155;
+
+    padding: 3px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+    flex-shrink: 0;
+}
+
+
+.privacy-toggle span {
+    display: block;
+
+    width: 24px;
+    height: 24px;
+
+    background: #fff;
+
+    border-radius: 50%;
+
+    transition: 0.3s;
+}
+
+
+.privacy-toggle.active {
+    background: #2563eb;
+}
+
+
+.privacy-toggle.active span {
+    transform: translateX(24px);
+}
+
+
+.privacy-toggle:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+/* SETTINGS LINKS */
+
+.setting-link {
+    padding: 15px 5px;
+
+    color: #cbd5e1;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+    cursor: pointer;
+
+    transition: 0.25s;
+}
+
+
+.setting-link:last-child {
+    border-bottom: none;
+}
+
+
+.setting-link:hover {
+    color: #60a5fa;
+
+    padding-left: 10px;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    .settings-container {
+        padding: 20px 12px;
+    }
+
+    .settings-card {
+        padding: 20px;
+
+        border-radius: 18px;
+    }
+
+    .settings-card h1 {
+        font-size: 25px;
+    }
+
+    .settings-section {
+        padding: 18px;
+    }
+
+    .setting-item {
+        align-items: center;
+    }
+
+}

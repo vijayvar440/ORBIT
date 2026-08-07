@@ -243,6 +243,97 @@ async function getFollowing(req, res) {
         });
     }
 }
+async function updatePrivacy(req, res) {
+    try {
+
+        const userId = req.user.id;
+        const { isPrivate } = req.body;
+
+        if (typeof isPrivate !== "boolean") {
+            return res.status(400).json({
+                message: "isPrivate must be true or false"
+            });
+        }
+
+        const updatedUser = await userModel
+            .findByIdAndUpdate(
+                userId,
+                { isPrivate },
+                { new: true }
+            )
+            .select("-password");
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            message: isPrivate
+                ? "Account is now private"
+                : "Account is now public",
+            user: updatedUser
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return res.status(500).json({
+            message: err.message
+        });
+    }
+}
+async function changePassword(req, res) {
+    try {
+
+        const userId = req.user.id;
+
+        const { oldPassword, newPassword } = req.body;
+
+        const user = await userModel.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        const isMatch = await bcrypt.compare(
+            oldPassword,
+            user.password
+        );
+
+        if (!isMatch) {
+            return res.status(400).json({
+                message: "Old password is incorrect"
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(
+            newPassword,
+            10
+        );
+
+        user.password = hashedPassword;
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "Password changed successfully"
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return res.status(500).json({
+            message: err.message
+        });
+
+    }
+}
 
 
 module.exports = {
@@ -252,5 +343,7 @@ module.exports = {
     getUserProfile,
     followUser,
     getFollowers,
-    getFollowing
+    getFollowing,
+    updatePrivacy,
+    changePassword
 };

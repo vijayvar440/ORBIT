@@ -19,6 +19,8 @@ import Followers from "./pages/Profile/Followers";
 
 import Chat from "./pages/Chat/Chat";
 import Inbox from "./pages/Chat/Inbox"; 
+import Settings from './pages/setting/Setting'
+
 
 
 
@@ -38,6 +40,7 @@ function App() {
                 <Route path="/user/:id" element={<UserProfile />} />
                 <Route path="/followers/:id"element={<Followers />}/>
               <Route path="/chat/:userId" element={<Chat />} />
+             
                 <Route
                         path="/messages"
                         element={
@@ -84,6 +87,14 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+                <Route
+    path="/setting"
+    element={
+        <ProtectedRoute>
+            <Settings />
+        </ProtectedRoute>
+    }
+/>
 
             </Routes>
         </>

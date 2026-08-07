@@ -133,6 +133,9 @@ function Navbar() {
         <LogOut size={20}/>
         Logout
     </button>
+    <Link to="/setting">
+    ⚙️ Settings
+</Link>
 
 </div>
 

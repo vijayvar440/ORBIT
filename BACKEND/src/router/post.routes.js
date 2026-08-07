@@ -6,7 +6,8 @@ const authMiddleware = require("../middlewares/auth.Middlewares");
 const upload = require("../middlewares/upload.middlewares");
 const userContoller = require("../controller/user.controller");
 
-// ================= POST =================
+
+
 
 router.post(
     "/createPost",
@@ -15,17 +16,20 @@ router.post(
     postController.creatPost
 );
 
+
 router.get(
     "/my-posts",
     authMiddleware,
     postController.getPost
 );
 
+
 router.get(
     "/all-posts",
     authMiddleware,
     postController.getAllPost
 );
+
 
 router.put(
     "/update/:id",
@@ -34,19 +38,22 @@ router.put(
     postController.updatePost
 );
 
+
 router.delete(
     "/delete/:id",
     authMiddleware,
     postController.deletPost
 );
 
-// ================= PROFILE =================
+
+
 
 router.get(
     "/profile",
     authMiddleware,
     userContoller.getProfile
 );
+
 
 router.put(
     "/update-profile",
@@ -55,19 +62,19 @@ router.put(
     userContoller.updateProfile
 );
 
+
 router.get(
     "/user/:id",
     userContoller.getUserProfile
 );
 
-// ================= SEARCH =================
 
 router.get(
     "/search/:keyword",
     userContoller.searchUser
 );
 
-// ================= FOLLOW =================
+
 
 router.put(
     "/follow/:userId",
@@ -75,17 +82,28 @@ router.put(
     userContoller.followUser
 );
 
+
 router.get(
     "/followers/:userId",
     userContoller.getFollowers
 );
+
 
 router.get(
     "/following/:userId",
     userContoller.getFollowing
 );
 
-// ================= LIKE & COMMENT =================
+
+
+
+router.put(
+    "/account/privacy",
+    authMiddleware,
+    userContoller.updatePrivacy
+);
+
+
 
 router.put(
     "/like/:id",
@@ -93,17 +111,29 @@ router.put(
     postController.likePost
 );
 
+
+
+
 router.post(
     "/comment/:id",
     authMiddleware,
     postController.addComment
 );
 
-// ================= SINGLE POST (Hamesha Last Dynamic Route) =================
 
+
+router.put(
+    "/change-password",
+    authMiddleware,
+    userContoller.changePassword
+);
+
+
+// Single Post — हमेशा सबसे last
 router.get(
     "/:postId",
     postController.getSinglePost
 );
 
 module.exports = router;
+
