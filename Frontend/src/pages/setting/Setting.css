@@ -202,3 +202,15 @@
     }
 
 }
+.logout-link {
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.logout-link:hover {
+    color: #ef4444;
+}

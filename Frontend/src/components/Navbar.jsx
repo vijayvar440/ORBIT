@@ -7,8 +7,8 @@ import {
     SquarePlus,
     CircleUserRound,
     MessageCircle,
-    LogOut
-} from "lucide-react";
+    Settings
+} from "lucide-react";      
 
 import "./Navbar.css";
 
@@ -67,7 +67,6 @@ function Navbar() {
         onChange={(e) => searchUser(e.target.value)}
     />
 
-    {/* YE DIV INPUT KE ANDAR NAHI, LEKIN SEARCH DIV KE ANDAR HOGA */}
     {users.length > 0 && (
 
         <div className="search-result">
@@ -129,12 +128,9 @@ function Navbar() {
         <span>Profile</span>
     </Link>
 
-    <button onClick={logout}>
-        <LogOut size={20}/>
-        Logout
-    </button>
-    <Link to="/setting">
-    ⚙️ Settings
+<Link to="/setting">
+    <Settings size={21} />
+    <span>Settings</span>
 </Link>
 
 </div>

@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "./Setting.css";
 import { useTheme } from "../../ThemeContext";
+import { useNavigate } from "react-router-dom";
 
 function Settings() {
 
     const [isPrivate, setIsPrivate] = useState(false);
     const [loading, setLoading] = useState(false);
     const { theme, toggleTheme } = useTheme();
+    const navigate = useNavigate();
 
     const fetchPrivacy = async () => {
 
@@ -71,6 +73,27 @@ function Settings() {
         }
 
     };
+    const handleLogout = async () => {
+    try {
+
+        await axios.post(
+            "http://localhost:3000/api/auth/logoutUser",
+            {},
+            {
+                withCredentials: true
+            }
+        );
+
+    } catch (err) {
+        console.log(err.response?.data || err.message);
+    } finally {
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+
+        navigate("/login");
+    }
+};
 
 
     return (
@@ -79,7 +102,7 @@ function Settings() {
 
             <div className="settings-card">
 
-                <h1>⚙️ Settings</h1>
+                <h1>⚙️</h1>
 
                 <p className="settings-subtitle">
                     Manage your account and privacy
@@ -177,10 +200,12 @@ function Settings() {
 
                     <h2>🛡️ Security</h2>
 
-                    <div className="setting-link">
-                        🚪 Logout
-                    </div>
-
+                   <button
+                     className="setting-link logout-link"
+                     onClick={handleLogout}
+                 >
+                     🚪 Logout
+                 </button>
                 </div>
 
             </div>
