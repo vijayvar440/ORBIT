@@ -1,0 +1,26 @@
+:root {
+    --bg: #eef2f7;
+    --card: #ffffff;
+    --text: #111827;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --primary: #2563eb;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+body.dark {
+    --bg: #080d1c;
+    --card: #151c2d;
+    --text: #ffffff;
+    --muted: #94a3b8;
+    --border: #263247;
+    --primary: #3b82f6;
+}

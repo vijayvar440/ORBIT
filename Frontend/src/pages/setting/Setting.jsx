@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./Setting.css";
+import { useTheme } from "../../ThemeContext";
 
 function Settings() {
 
     const [isPrivate, setIsPrivate] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { theme, toggleTheme } = useTheme();
 
     const fetchPrivacy = async () => {
 
@@ -46,7 +48,7 @@ function Settings() {
            await axios.put(
     "http://localhost:3000/api/Post/account/privacy",
     {
-        isPrivate: newValue
+        isPrivate: newPrivacy
     },
     {
         headers: {
@@ -140,7 +142,36 @@ function Settings() {
                 </div>
 
 
-                {/* SECURITY */}
+
+            <div className="settings-section">
+
+                <h2>🎨 Appearance</h2>
+
+                <div className="setting-item">
+
+                    <div className="setting-info">
+
+                        <h3>Theme</h3>
+
+                        <p>
+                            {theme === "dark"
+                                ? "Dark theme is enabled."
+                                : "Light theme is enabled."
+                            }
+                        </p>
+
+                    </div>
+
+                    <button
+                    className="theme-btn"
+                    onClick={toggleTheme}
+                >
+                    {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
+                </button>
+
+                </div>
+
+            </div>
 
                 <div className="settings-section">
 
