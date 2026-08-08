@@ -76,30 +76,72 @@ async function getPost(req, res) {
 
 async function getAllPost(req, res) {
     try {
+        const loggedUserId = req.user.id;
+
+        
+        const loggedUser = await userModel.findById(loggedUserId);
+
+        if (!loggedUser) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+    
+        const followingIds = loggedUser.following.map(
+            id => id.toString()
+        );
+
+        
+        followingIds.push(loggedUserId.toString());
+
 
         const posts = await postModel
             .find()
-            .populate("uploadedBy", "username profileImage")
+            .populate(
+                "uploadedBy",
+                "username profileImage isPrivate followers"
+            )
             .sort({ createdAt: -1 });
 
-        let following = [];
-        let loggedUserId = "";
 
-        // Agar user login hai
-        if (req.user) {
+        const visiblePosts = posts.filter(post => {
 
-            const user = await userModel.findById(req.user.id);
+            const owner = post.uploadedBy;
 
-            following = user.following;
-            loggedUserId = user._id;
+            if (!owner) {
+                return false;
+            }
 
-        }
+        
+            if (!owner.isPrivate) {
+                return true;
+            }
+
+            
+            if (owner._id.toString() === loggedUserId.toString()) {
+                return true;
+            }
+
+            
+            const isFollower = owner.followers?.some(
+                followerId =>
+                    followerId.toString() === loggedUserId.toString()
+            );
+
+            if (isFollower) {
+                return true;
+            }
+
+        
+            return false;
+        });
 
         return res.status(200).json({
             message: "All Posts Fetched Successfully",
-            totalPosts: posts.length,
-            posts,
-            following,
+            totalPosts: visiblePosts.length,
+            posts: visiblePosts,
+            following: loggedUser.following,
             loggedUserId
         });
 
@@ -283,15 +325,37 @@ async function updatePost(req,res) {
 async function getSinglePost(req, res) {
     try {
         const postId = req.params.postId;
+        const loggedUserId = req.user?.id;
 
         const post = await postModel
             .findById(postId)
-            .populate("uploadedBy", "username profileImage")
+            .populate("uploadedBy", "username profileImage isPrivate followers")
             .populate("comments.user", "username profileImage");
 
         if (!post) {
             return res.status(404).json({
                 message: "Post not found"
+            });
+        }
+
+        const owner = post.uploadedBy;
+
+        
+        const isOwner =
+            loggedUserId &&
+            owner._id.toString() === loggedUserId.toString();
+
+        // Check follower
+        const isFollower =
+            loggedUserId &&
+            owner.followers?.some(
+                id => id.toString() === loggedUserId.toString()
+            );
+
+        
+        if (owner.isPrivate && !isOwner && !isFollower) {
+            return res.status(403).json({
+                message: "This account is private"
             });
         }
 
@@ -301,6 +365,7 @@ async function getSinglePost(req, res) {
         });
 
     } catch (err) {
+
         console.log(err);
 
         return res.status(500).json({

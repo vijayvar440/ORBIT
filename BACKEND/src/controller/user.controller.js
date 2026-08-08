@@ -100,6 +100,7 @@ async function getUserProfile(req, res) {
     try {
 
         const userId = req.params.id;
+        const loggedUserId = req.user?.id;
 
         const user = await userModel
             .findById(userId)
@@ -111,19 +112,52 @@ async function getUserProfile(req, res) {
             });
         }
 
+        
+        const isOwner =
+            loggedUserId &&
+            loggedUserId.toString() === userId.toString();
+
+        
+        const isFollower =
+            loggedUserId &&
+            user.followers.some(
+                id => id.toString() === loggedUserId.toString()
+            );
+
+        
+
+        if (user.isPrivate && !isOwner && !isFollower) {
+
+            return res.status(200).json({
+                user,
+                posts: [],
+                isPrivate: true,
+                canViewPosts: false,
+                message: "This account is private"
+            });
+        }
+
+       
+
         const posts = await postModel.find({
             uploadedBy: userId
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             user,
-            posts
+            posts,
+            isPrivate: user.isPrivate,
+            canViewPosts: true
         });
 
     } catch (err) {
-        res.status(500).json({
+
+        console.log(err);
+
+        return res.status(500).json({
             message: err.message
         });
+
     }
 }
 
@@ -148,14 +182,14 @@ async function followUser(req, res) {
             });
         }
 
-        // Check if already following
+    
         const alreadyFollowing = loggedUser.following.some(
             id => id.toString() === targetUserId
         );
 
         if (alreadyFollowing) {
 
-            // Unfollow
+            
             loggedUser.following = loggedUser.following.filter(
                 id => id.toString() !== targetUserId
             );
@@ -173,7 +207,7 @@ async function followUser(req, res) {
 
         } else {
 
-            // Follow
+        
             loggedUser.following.push(targetUserId);
             targetUser.followers.push(loggedUserId);
 

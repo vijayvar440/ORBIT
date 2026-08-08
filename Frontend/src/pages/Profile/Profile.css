@@ -170,3 +170,114 @@ body{
 .message-icon-btn:hover{
     background:#ddd;
 }
+
+
+
+/* ============================= */
+/* PRIVATE ACCOUNT MESSAGE */
+/* ============================= */
+
+.private-account-message {
+    width: 100%;
+    min-height: 300px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 50px 20px;
+    margin-top: 20px;
+
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+}
+
+.private-icon {
+    width: 70px;
+    height: 70px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 32px;
+
+    background: #eef2ff;
+    border-radius: 50%;
+
+    margin-bottom: 18px;
+}
+
+.private-account-message h2 {
+    margin: 0 0 8px;
+
+    font-size: 22px;
+    font-weight: 700;
+
+    color: #222;
+}
+
+.private-account-message p {
+    margin: 0 0 20px;
+
+    color: #777;
+    font-size: 15px;
+}
+
+.private-account-message .edit-btn {
+    padding: 10px 25px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.private-account-message .edit-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+
+/* ============================= */
+/* MOBILE */
+/* ============================= */
+
+@media (max-width: 768px) {
+
+    .private-account-message {
+        min-height: 250px;
+
+        padding: 35px 15px;
+
+        border-radius: 12px;
+    }
+
+    .private-icon {
+        width: 60px;
+        height: 60px;
+
+        font-size: 27px;
+    }
+
+    .private-account-message h2 {
+        font-size: 19px;
+    }
+
+    .private-account-message p {
+        font-size: 14px;
+    }
+
+}

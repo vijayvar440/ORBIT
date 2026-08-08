@@ -14,17 +14,28 @@ function UserProfile() {
     const [posts, setPosts] = useState([]);
     const [following, setFollowing] = useState(false);
     const [isMyProfile, setIsMyProfile] = useState(false);
+    const [canViewPosts, setCanViewPosts] = useState(true);
+    const [isPrivate, setIsPrivate] = useState(false);
 
    const fetchUserProfile = async () => {
 
     try {
 
         const response = await axios.get(
-            `http://localhost:3000/api/Post/user/${id}`
-        );
+    `http://localhost:3000/api/Post/user/${id}`,
+    {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
+        withCredentials: true
+    }
+);
 
         setUser(response.data.user);
-        setPosts(response.data.posts);
+         setPosts(response.data.posts || []);
+         
+         setIsPrivate(response.data.isPrivate || false);
+         setCanViewPosts(response.data.canViewPosts ?? true);
 
         const loggedUserId = localStorage.getItem("userId");
 
@@ -185,51 +196,91 @@ function UserProfile() {
 
             <hr />
 
-            <div className="posts-grid">
-                    {posts.map((post) => (
+            {canViewPosts ? (
 
-                    <div
-                        className="post-card"
-                        key={post._id}
-                        onClick={() => navigate(`/post/${post._id}`)}
-                    >
+    <div className="posts-grid">
 
-                        {post.mediaType === "image" && (
-                            <img
+        {posts.length > 0 ? (
+
+            posts.map((post) => (
+
+                <div
+                    className="post-card"
+                    key={post._id}
+                    onClick={() => navigate(`/post/${post._id}`)}
+                >
+
+                    {post.mediaType === "image" && (
+                        <img
+                            src={post.media}
+                            alt={post.title}
+                        />
+                    )}
+
+                    {post.mediaType === "video" && (
+                        <video controls>
+                            <source
                                 src={post.media}
-                                alt={post.title}
+                                type="video/mp4"
                             />
-                        )}
+                        </video>
+                    )}
 
-                        {post.mediaType === "video" && (
-                            <video controls>
-                                <source
-                                    src={post.media}
-                                    type="video/mp4"
-                                />
-                            </video>
-                        )}
+                    {post.mediaType === "audio" && (
+                        <audio controls>
+                            <source
+                                src={post.media}
+                                type="audio/mpeg"
+                            />
+                        </audio>
+                    )}
 
-                        {post.mediaType === "audio" && (
-                            <audio controls>
-                                <source
-                                    src={post.media}
-                                    type="audio/mpeg"
-                                />
-                            </audio>
-                        )}
+                    <h3>{post.title}</h3>
 
-                        <h3>{post.title}</h3>
+                    <p>{post.description}</p>
 
-                        <p>{post.description}</p>
+                </div>
 
-                    </div>
+            ))
 
-                ))}
+        ) : (
+
+            <p>No posts yet.</p>
+
+        )}
+
+    </div>
+
+) : (
+
+    <div className="private-account-message">
+
+        <div className="private-icon">
+            🔒
+        </div>
+
+        <h2>This Account is Private</h2>
+
+        <p>
+            Follow this account to see their posts.
+        </p>
+
+        {!following && !isMyProfile && (
+            <button
+                className="edit-btn"
+                onClick={handleFollow}
+            >
+                Follow
+            </button>
+        )}
+
+    </div>
+
+)}
 
             </div>
 
-        </div>
+        
 
     );
 

@@ -65,6 +65,7 @@ router.put(
 
 router.get(
     "/user/:id",
+    authMiddleware,
     userContoller.getUserProfile
 );
 
@@ -129,9 +130,9 @@ router.put(
 );
 
 
-// Single Post — हमेशा सबसे last
 router.get(
     "/:postId",
+    authMiddleware,
     postController.getSinglePost
 );
 
