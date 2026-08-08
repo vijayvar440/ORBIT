@@ -23,28 +23,33 @@ function Chat() {
     const [preview, setPreview] = useState("");
     
 
-    const fetchMessages = async () => {
+ const fetchUser = async () => {
+    try {
 
-        try {
-
-            const response = await axios.get(
-                `http://localhost:3000/api/message/${userId}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`
-                    }
+        const response = await axios.get(
+            `http://localhost:3000/api/Post/user/${userId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
-            );
+            }
+        );
 
-            setMessages(response.data.messages);
+        console.log("CHAT USER:", response.data.user);
 
-        } catch (err) {
+        setUser(response.data.user);
 
-            console.log(err.response?.data || err.message);
+    } catch (err) {
 
-        }
+        console.log(
+            "FETCH USER ERROR:",
+            err.response?.data || err.message
+        );
 
-    };
+    }
+};
+
+
    const sendMessage = async () => {
 
     if (!text.trim() && !selectedFile) return;
@@ -101,23 +106,8 @@ socket.emit("stop_typing", {
     }
 
 };
-const fetchUser = async () => {
 
-    try {
 
-        const response = await axios.get(
-            `http://localhost:3000/api/Post/user/${userId}`
-        );
-
-        setUser(response.data.user);
-
-    } catch (err) {
-
-        console.log(err.response?.data || err.message);
-
-    }
-
-};
 const formatLastSeen = (date) => {
 
     if (!date) return "";
@@ -160,7 +150,7 @@ const handleStopTyping = () => {
 socket.on("typing", handleTyping);
 socket.on("stop_typing", handleStopTyping);
 
-    fetchMessages();
+  
     fetchUser();
 
     

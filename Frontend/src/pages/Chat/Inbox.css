@@ -37,3 +37,26 @@
     margin-top:5px;
     color:#666;
 }
+
+
+
+body.dark .inbox-container {
+    background: #1f2937;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.35);
+}
+
+body.dark .chat-card {
+    border-bottom-color: #374151;
+}
+
+body.dark .chat-card:hover {
+    background: #374151;
+}
+
+body.dark .chat-info h3 {
+    color: #ffffff;
+}
+
+body.dark .chat-info p {
+    color: #9ca3af;
+}
