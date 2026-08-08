@@ -1,0 +1,23 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
+    background: #ffffff;
+    color: #222222;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* DARK MODE */
+body.dark {
+    background: #111827;
+    color: #ffffff;
+}

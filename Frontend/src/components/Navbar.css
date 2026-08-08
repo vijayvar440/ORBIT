@@ -342,3 +342,58 @@
         height: 38px;
     }
 }
+
+
+body.dark .navbar {
+    background: rgba(17, 24, 39, 0.92);
+    border-bottom-color: #374151;
+}
+
+body.dark .search {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+body.dark .search input {
+    color: #ffffff;
+}
+
+body.dark .search input::placeholder {
+    color: #9ca3af;
+}
+
+body.dark .search:focus-within {
+    background: #1f2937;
+    border-color: #60a5fa;
+}
+
+body.dark .search-result {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+body.dark .search-user:hover {
+    background: #374151;
+}
+
+body.dark .search-user h4 {
+    color: #ffffff;
+}
+
+body.dark .search-user p {
+    color: #9ca3af;
+}
+
+body.dark .nav-menu a {
+    color: #d1d5db;
+}
+
+body.dark .nav-menu a:hover {
+    background: #1f2937;
+    color: #60a5fa;
+}
+
+body.dark .nav-menu a.active {
+    background: #1f2937;
+    color: #60a5fa;
+}
