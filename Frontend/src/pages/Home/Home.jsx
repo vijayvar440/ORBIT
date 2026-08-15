@@ -190,6 +190,38 @@ const handleFollow = async (userId) => {
         <div className="home-container">
 
             <div className="feed">
+                {posts.length === 0 && (
+    <div className="welcome-card">
+
+        <div className="welcome-icon">
+            🚀
+        </div>
+
+        <h1>Welcome to ORBIT! 👋</h1>
+
+        <p>
+            Your account is ready.
+            Start connecting with people and sharing your world.
+        </p>
+
+        <div className="welcome-actions">
+
+            <button
+                onClick={() => navigate("/create-post")}
+            >
+                ➕ Create Your First Post
+            </button>
+
+            <button
+                onClick={() => navigate("/users")}
+            >
+                👥 Discover People
+            </button>
+
+        </div>
+
+    </div>
+)}
 
                 {
 

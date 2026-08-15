@@ -1,6 +1,7 @@
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const path = require("path");
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -10,6 +11,7 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
+
     params: async (req, file) => {
 
         let resourceType = "image";
@@ -22,10 +24,12 @@ const storage = new CloudinaryStorage({
             resourceType = "video";
         }
 
+        const fileName = path.parse(file.originalname).name;
+
         return {
             folder: "social-snap",
             resource_type: resourceType,
-            public_id: Date.now() + "-" + file.originalname
+            public_id: Date.now() + "-" + fileName
         };
     }
 });

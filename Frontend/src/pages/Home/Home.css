@@ -449,3 +449,135 @@ body.dark .following-btn:hover {
         font-size: 13px;
     }
 }
+
+
+
+.welcome-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 40px 30px;
+    margin-bottom: 28px;
+    text-align: center;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+    border: 1px solid #e5e7eb;
+}
+
+.welcome-icon {
+    width: 70px;
+    height: 70px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #eef4ff;
+    border-radius: 50%;
+
+    font-size: 34px;
+}
+
+.welcome-card h1 {
+    margin: 0 0 12px;
+
+    font-size: 28px;
+    color: #111827;
+}
+
+.welcome-card p {
+    max-width: 500px;
+
+    margin: 0 auto 25px;
+
+    color: #6b7280;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.welcome-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.welcome-actions button {
+    border: none;
+    border-radius: 10px;
+
+    padding: 12px 18px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    background: #1877f2;
+    color: white;
+
+    transition: 0.25s ease;
+}
+
+.welcome-actions button:hover {
+    transform: translateY(-2px);
+    background: #0f63d1;
+}
+
+.welcome-actions button:nth-child(2) {
+    background: #eef4ff;
+    color: #1877f2;
+}
+
+.welcome-actions button:nth-child(2):hover {
+    background: #dbeafe;
+}
+
+
+/* DARK MODE */
+
+body.dark .welcome-card {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+body.dark .welcome-card h1 {
+    color: #ffffff;
+}
+
+body.dark .welcome-card p {
+    color: #9ca3af;
+}
+
+body.dark .welcome-icon {
+    background: #374151;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 480px) {
+
+    .welcome-card {
+        padding: 30px 20px;
+        border-radius: 15px;
+    }
+
+    .welcome-card h1 {
+        font-size: 23px;
+    }
+
+    .welcome-card p {
+        font-size: 14px;
+    }
+
+    .welcome-actions {
+        flex-direction: column;
+    }
+
+    .welcome-actions button {
+        width: 100%;
+    }
+}

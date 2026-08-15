@@ -78,7 +78,6 @@ async function getAllPost(req, res) {
     try {
         const loggedUserId = req.user.id;
 
-        
         const loggedUser = await userModel.findById(loggedUserId);
 
         if (!loggedUser) {
@@ -87,23 +86,23 @@ async function getAllPost(req, res) {
             });
         }
 
-    
+        // Jin users ko current user follow karta hai
         const followingIds = loggedUser.following.map(
             id => id.toString()
         );
 
-        
+        // Apne khud ke posts bhi dekh sake
         followingIds.push(loggedUserId.toString());
 
-
         const posts = await postModel
-            .find()
+            .find({
+                uploadedBy: { $in: followingIds }
+            })
             .populate(
                 "uploadedBy",
                 "username profileImage isPrivate followers"
             )
             .sort({ createdAt: -1 });
-
 
         const visiblePosts = posts.filter(post => {
 
@@ -113,32 +112,18 @@ async function getAllPost(req, res) {
                 return false;
             }
 
-        
-            if (!owner.isPrivate) {
+            // Apne posts hamesha dikhenge
+            if (
+                owner._id.toString() === loggedUserId.toString()
+            ) {
                 return true;
             }
 
-            
-            if (owner._id.toString() === loggedUserId.toString()) {
-                return true;
-            }
-
-            
-            const isFollower = owner.followers?.some(
-                followerId =>
-                    followerId.toString() === loggedUserId.toString()
-            );
-
-            if (isFollower) {
-                return true;
-            }
-
-        
-            return false;
+            return true;
         });
 
         return res.status(200).json({
-            message: "All Posts Fetched Successfully",
+            message: "Posts Fetched Successfully",
             totalPosts: visiblePosts.length,
             posts: visiblePosts,
             following: loggedUser.following,
