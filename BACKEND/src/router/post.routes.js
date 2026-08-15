@@ -74,6 +74,11 @@ router.get(
     "/search/:keyword",
     userContoller.searchUser
 );
+router.get(
+    "/discover",
+    authMiddleware,
+    userContoller.getDiscoverUsers
+);
 
 
 

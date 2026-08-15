@@ -277,6 +277,40 @@ async function getFollowing(req, res) {
         });
     }
 }
+async function getDiscoverUsers(req, res) {
+    try {
+        const loggedUserId = req.user.id;
+
+        const loggedUser = await userModel.findById(loggedUserId);
+
+        if (!loggedUser) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        const users = await userModel
+            .find({
+                _id: {
+                    $ne: loggedUserId
+                }
+            })
+            .select("username profileImage bio followers following isPrivate");
+
+        return res.status(200).json({
+            message: "Discover users fetched successfully",
+            users
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return res.status(500).json({
+            message: err.message
+        });
+    }
+}
 async function updatePrivacy(req, res) {
     try {
 
@@ -378,6 +412,7 @@ module.exports = {
     followUser,
     getFollowers,
     getFollowing,
+    getDiscoverUsers,
     updatePrivacy,
     changePassword
 };
