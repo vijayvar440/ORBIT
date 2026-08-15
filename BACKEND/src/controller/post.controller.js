@@ -76,6 +76,7 @@ async function getPost(req, res) {
 
 async function getAllPost(req, res) {
     try {
+
         const loggedUserId = req.user.id;
 
         const loggedUser = await userModel.findById(loggedUserId);
@@ -86,23 +87,22 @@ async function getAllPost(req, res) {
             });
         }
 
-        // Jin users ko current user follow karta hai
+        
         const followingIds = loggedUser.following.map(
             id => id.toString()
         );
 
-        // Apne khud ke posts bhi dekh sake
+        // Apne khud ke posts bhi dikhne chahiye
         followingIds.push(loggedUserId.toString());
 
         const posts = await postModel
-            .find({
-                uploadedBy: { $in: followingIds }
-            })
+            .find()
             .populate(
                 "uploadedBy",
                 "username profileImage isPrivate followers"
             )
             .sort({ createdAt: -1 });
+
 
         const visiblePosts = posts.filter(post => {
 
@@ -112,18 +112,36 @@ async function getAllPost(req, res) {
                 return false;
             }
 
-            // Apne posts hamesha dikhenge
-            if (
-                owner._id.toString() === loggedUserId.toString()
-            ) {
+            const ownerId = owner._id.toString();
+
+            // Apna post
+            if (ownerId === loggedUserId.toString()) {
                 return true;
             }
 
-            return true;
+            
+            if (followingIds.includes(ownerId)) {
+
+                if (!owner.isPrivate) {
+                    return true;
+                }
+
+                const isFollower = owner.followers?.some(
+                    followerId =>
+                        followerId.toString() ===
+                        loggedUserId.toString()
+                );
+
+                return isFollower;
+            }
+
+            // Follow nahi kiya → post mat dikhao
+            return false;
         });
 
+
         return res.status(200).json({
-            message: "Posts Fetched Successfully",
+            message: "Posts fetched successfully",
             totalPosts: visiblePosts.length,
             posts: visiblePosts,
             following: loggedUser.following,

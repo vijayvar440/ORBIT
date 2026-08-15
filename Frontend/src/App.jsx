@@ -20,6 +20,7 @@ import Followers from "./pages/Profile/Followers";
 import Chat from "./pages/Chat/Chat";
 import Inbox from "./pages/Chat/Inbox"; 
 import Settings from './pages/setting/Setting'
+import Discover from "./pages/Discover/Discover";
 
 
 
@@ -59,6 +60,14 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+                <Route
+                      path="/users"
+                      element={
+                          <ProtectedRoute>
+                              <Discover />
+                          </ProtectedRoute>
+                      }
+                  />
 
                 {/* Protected Create Post */}
                 <Route
@@ -87,9 +96,9 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-                <Route
-    path="/setting"
-    element={
+         <Route
+           path="/setting"
+           element={
         <ProtectedRoute>
             <Settings />
         </ProtectedRoute>

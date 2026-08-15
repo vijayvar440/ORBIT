@@ -19,7 +19,16 @@ function Discover() {
                 }
             );
 
-            setUsers(response.data.users);
+            const currentUserId = localStorage.getItem("userId");
+
+            const updatedUsers = response.data.users.map((user) => ({
+                ...user,
+                isFollowing: user.followers?.some(
+                    id => String(id) === String(currentUserId)
+                )
+            }));
+
+            setUsers(updatedUsers);
 
         } catch (err) {
 
@@ -28,23 +37,71 @@ function Discover() {
             );
 
         } finally {
+
             setLoading(false);
+
         }
     };
+
+
+    // FOLLOW / UNFOLLOW
+    const handleFollow = async (userId) => {
+
+        try {
+
+            const response = await axios.put(
+                `http://localhost:3000/api/Post/follow/${userId}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                }
+            );
+
+            console.log(response.data);
+
+
+            // Button state update
+            setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                    user._id === userId
+                        ? {
+                            ...user,
+                            isFollowing: !user.isFollowing
+                        }
+                        : user
+                )
+            );
+
+        } catch (err) {
+
+            console.log(
+                err.response?.data || err.message
+            );
+
+        }
+    };
+
 
     useEffect(() => {
         fetchUsers();
     }, []);
 
+
     if (loading) {
+
         return (
             <div className="discover-container">
                 <h2>Finding people...</h2>
             </div>
         );
+
     }
 
+
     return (
+
         <div className="discover-container">
 
             <div className="discover-card">
@@ -54,6 +111,7 @@ function Discover() {
                 <p className="discover-subtitle">
                     Find people and follow them to see their posts.
                 </p>
+
 
                 <div className="users-list">
 
@@ -80,9 +138,12 @@ function Discover() {
                                     alt=""
                                 />
 
+
                                 <div className="discover-user-info">
 
-                                    <h3>{user.username}</h3>
+                                    <h3>
+                                        {user.username}
+                                    </h3>
 
                                     <p>
                                         {user.bio ||
@@ -91,8 +152,22 @@ function Discover() {
 
                                 </div>
 
-                                <button>
-                                    Follow
+
+                                <button
+                                    className={
+                                        user.isFollowing
+                                            ? "following-btn"
+                                            : ""
+                                    }
+                                    onClick={() =>
+                                        handleFollow(user._id)
+                                    }
+                                >
+
+                                    {user.isFollowing
+                                        ? "Following"
+                                        : "Follow"}
+
                                 </button>
 
                             </div>
@@ -106,6 +181,7 @@ function Discover() {
             </div>
 
         </div>
+
     );
 }
 

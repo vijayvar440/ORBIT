@@ -30,7 +30,16 @@ const messageSchema = new mongoose.Schema(
     file: {
         type: String,
         default: ""
-    }
+    },
+    deletedForEveryone: {
+    type: Boolean,
+    default: false
+},
+
+deletedFor: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user"
+}]
 
 },
 {

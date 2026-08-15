@@ -21,7 +21,7 @@ function Chat() {
     const [typing, setTyping] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const [preview, setPreview] = useState("");
-    
+    const [menuMessageId, setMenuMessageId] = useState(null);
 
  const fetchUser = async () => {
     try {
@@ -181,6 +181,66 @@ useEffect(() => {
     };
 }, []);
 
+const deleteMessage = async (messageId, deleteType) => {
+    try {
+
+        const response = await axios.delete(
+            `http://localhost:3000/api/message/delete/${messageId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                },
+                data: {
+                    deleteType
+                }
+            }
+        );
+
+        console.log(response.data);
+
+      
+        setMessages((prev) =>
+            prev.map((msg) => {
+
+                if (msg._id !== messageId) {
+                    return msg;
+                }
+
+                if (deleteType === "everyone") {
+
+                    return {
+                        ...msg,
+                        deletedForEveryone: true,
+                        message: "",
+                        image: "",
+                        video: "",
+                        file: ""
+                    };
+
+                }
+
+                return {
+                    ...msg,
+                    deletedFor: [
+                        ...(msg.deletedFor || []),
+                        localStorage.getItem("userId")
+                    ]
+                };
+
+            })
+        );
+
+        setMenuMessageId(null);
+
+    } catch (err) {
+
+        console.log(
+            err.response?.data || err.message
+        );
+
+    }
+};
+
 return (
     <div className="chat-container">
 
@@ -210,59 +270,154 @@ return (
 
        <div className="chat-body">
 
-    {messages.map((msg) => (
+   {messages.map((msg) => {
 
+    const currentUserId = localStorage.getItem("userId");
+
+    const isMyMessage =
+        String(msg.sender) === String(currentUserId);
+
+    const isDeletedForMe =
+        msg.deletedFor?.some(
+            id => String(id) === String(currentUserId)
+        );
+
+    if (isDeletedForMe) {
+        return null;
+    }
+
+    return (
         <div
             key={msg._id}
             className={
-                String(msg.sender) === localStorage.getItem("userId")
+                isMyMessage
                     ? "my-message"
                     : "other-message"
             }
         >
 
-           <div className="message-box">
+            <div className="message-box">
 
-    {msg.image && (
-        <img
-            src={msg.image}
-            alt="chat"
-            className="chat-image"
-        />
-    )}
+                {/* THREE DOT MENU */}
 
-    {msg.video && (
-        <video controls className="chat-video">
-            <source src={msg.video} />
-        </video>
-    )}
+                <button
+                    className="message-menu-btn"
+                    onClick={() =>
+                        setMenuMessageId(
+                            menuMessageId === msg._id
+                                ? null
+                                : msg._id
+                        )
+                    }
+                >
+                    ⋮
+                </button>
 
-    {msg.file && (
-        <a
-            href={msg.file}
-            target="_blank"
-            rel="noreferrer"
-        >
-            📄 Download File
-        </a>
-    )}
 
-    {msg.message && (
-        <p>{msg.message}</p>
-    )}
+                {/* DELETE MENU */}
 
-    <span className="message-time">
-        {new Date(msg.createdAt).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-        })}
-    </span>
+                {menuMessageId === msg._id && (
 
-</div>
+                    <div className="message-menu">
+
+                        <button
+                            onClick={() =>
+                                deleteMessage(
+                                    msg._id,
+                                    "me"
+                                )
+                            }
+                        >
+                            🗑️ Delete for me
+                        </button>
+
+
+                        {isMyMessage &&
+                            !msg.deletedForEveryone && (
+
+                            <button
+                                onClick={() =>
+                                    deleteMessage(
+                                        msg._id,
+                                        "everyone"
+                                    )
+                                }
+                            >
+                                🗑️ Delete for everyone
+                            </button>
+
+                        )}
+
+                    </div>
+
+                )}
+
+
+                {/* DELETED MESSAGE */}
+
+                {msg.deletedForEveryone ? (
+
+                    <p className="deleted-message">
+                        🚫 This message was deleted
+                    </p>
+
+                ) : (
+
+                    <>
+
+                        {msg.image && (
+                            <img
+                                src={msg.image}
+                                alt="chat"
+                                className="chat-image"
+                            />
+                        )}
+
+
+                        {msg.video && (
+                            <video
+                                controls
+                                className="chat-video"
+                            >
+                                <source src={msg.video} />
+                            </video>
+                        )}
+
+
+                        {msg.file && (
+                            <a
+                                href={msg.file}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                📄 Download File
+                            </a>
+                        )}
+
+
+                        {msg.message && (
+                            <p>{msg.message}</p>
+                        )}
+
+                    </>
+
+                )}
+
+
+                <span className="message-time">
+                    {new Date(
+                        msg.createdAt
+                    ).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    })}
+                </span>
+
+            </div>
 
         </div>
-
-    ))}
+    );
+})}
 
     {typing && (
         <div className="typing-text">

@@ -368,3 +368,64 @@ body.dark .chat-footer {
         width: 210px;
     }
 }
+.message-box {
+    position: relative;
+}
+
+.message-menu-btn {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+
+    background: transparent;
+    border: none;
+
+    font-size: 20px;
+    cursor: pointer;
+
+    color: #777;
+}
+
+.message-menu {
+    position: absolute;
+
+    right: 5px;
+    top: 30px;
+
+    background: white;
+
+    border-radius: 8px;
+
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+
+    overflow: hidden;
+
+    z-index: 100;
+}
+
+.message-menu button {
+    display: block;
+
+    width: 180px;
+
+    padding: 10px 14px;
+
+    border: none;
+    background: white;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    font-size: 13px;
+}
+
+.message-menu button:hover {
+    background: #f1f1f1;
+}
+
+.deleted-message {
+    color: #888;
+    font-style: italic;
+    margin: 0;
+}

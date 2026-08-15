@@ -170,8 +170,89 @@ const getInbox = async (req, res) => {
     }
 
 };
+const deleteMessage = async (req, res) => {
+
+    try {
+
+        const userId = req.user.id;
+        const messageId = req.params.messageId;
+        const { deleteType } = req.body;
+
+        const message = await messageModel.findById(messageId);
+
+        if (!message) {
+            return res.status(404).json({
+                message: "Message not found"
+            });
+        }
+
+
+        // DELETE FOR EVERYONE
+        if (deleteType === "everyone") {
+
+            // Sirf sender delete for everyone kar sakta hai
+            if (String(message.sender) !== String(userId)) {
+
+                return res.status(403).json({
+                    message: "Only sender can delete message for everyone"
+                });
+
+            }
+
+            message.deletedForEveryone = true;
+
+            // Original content remove
+            message.message = "";
+            message.image = "";
+            message.video = "";
+            message.file = "";
+
+            await message.save();
+
+            return res.status(200).json({
+                message: "Message deleted for everyone",
+                deletedMessage: message
+            });
+        }
+
+
+        // DELETE FOR ME
+        if (deleteType === "me") {
+
+            const alreadyDeleted = message.deletedFor.some(
+                id => String(id) === String(userId)
+            );
+
+            if (!alreadyDeleted) {
+                message.deletedFor.push(userId);
+            }
+
+            await message.save();
+
+            return res.status(200).json({
+                message: "Message deleted for you",
+                deletedMessage: message
+            });
+        }
+
+
+        return res.status(400).json({
+            message: "Invalid delete type"
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return res.status(500).json({
+            message: err.message
+        });
+
+    }
+};
 module.exports = {
     sendMessage,
     getMessages,
-    getInbox
+    getInbox,
+    deleteMessage
 };
