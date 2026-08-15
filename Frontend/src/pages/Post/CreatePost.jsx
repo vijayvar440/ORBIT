@@ -42,11 +42,17 @@ function CreatePost() {
         }
     };
 
-    return (
-        <div>
+   return (
+    <div className="create-post-container">
+
+        <div className="create-post-card">
+
             <h1>Create Post</h1>
 
-            <form onSubmit={handleSubmit}>
+            <form
+                className="create-post-form"
+                onSubmit={handleSubmit}
+            >
 
                 <input
                     type="text"
@@ -55,19 +61,13 @@ function CreatePost() {
                     onChange={(e) => setTitle(e.target.value)}
                 />
 
-                <br /><br />
-
                 <textarea
                     placeholder="Enter Description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                 />
 
-                <br /><br />
-
                 <label>Select Media Type</label>
-
-                <br /><br />
 
                 <select
                     value={mediaType}
@@ -81,9 +81,8 @@ function CreatePost() {
                     <option value="audio">Audio</option>
                 </select>
 
-                <br /><br />
-
                 <input
+                    className="file-input"
                     type="file"
                     accept={
                         mediaType === "image"
@@ -92,18 +91,24 @@ function CreatePost() {
                             ? "video/*"
                             : "audio/*"
                     }
-                    onChange={(e) => setMedia(e.target.files[0])}
+                    onChange={(e) =>
+                        setMedia(e.target.files[0])
+                    }
                 />
 
-                <br /><br />
-
-                <button type="submit">
+                <button
+                    className="create-post-btn"
+                    type="submit"
+                >
                     Create Post
                 </button>
 
             </form>
+
         </div>
-    );
+
+    </div>
+);
 }
 
 export default CreatePost;

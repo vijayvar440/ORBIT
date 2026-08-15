@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
     const navigate = useNavigate();
 
 
@@ -41,10 +42,15 @@ function Login() {
 
                 navigate("/");
 
-        } catch (error) {
-            console.log(error.response?.data || error.message);
-        }
-    };
+
+      } catch (error) {
+    console.log(error.response?.data || error.message);
+
+    setError(
+        error.response?.data?.message || "Something went wrong"
+    );
+      }
+    }
 
     return (
     <div className="login-container">
@@ -68,6 +74,11 @@ function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
+                {error && (
+                 <p className="login-error">
+                     {error}
+                 </p>
+             )}
 
                 <button className="login-btn" type="submit">
                     Login

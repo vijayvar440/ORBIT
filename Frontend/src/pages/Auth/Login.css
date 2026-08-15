@@ -67,3 +67,13 @@ body{
     color:#0095f6;
     font-weight:bold;
 }
+.login-error {
+    color: #dc2626;
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-size: 14px;
+    text-align: center;
+}
