@@ -17,71 +17,122 @@ const io = new Server(server, {
     }
 });
 
+
+const notificationRoutes =
+    require("./src/router/notification.routes");
+
+app.use(
+    "/api/notification",
+    notificationRoutes
+);
+
+
 const users = {};
 
 io.on("connection", (socket) => {
 
     console.log("🟢 User Connected:", socket.id);
 
+
     socket.on("join", (userId) => {
 
         users[userId] = socket.id;
 
-        io.emit("online-users", Object.keys(users));
+        io.emit(
+            "online-users",
+            Object.keys(users)
+        );
 
     });
+
 
     socket.on("disconnect", () => {
 
         for (let id in users) {
+
             if (users[id] === socket.id) {
                 delete users[id];
                 break;
             }
+
         }
 
-        io.emit("online-users", Object.keys(users));
+        io.emit(
+            "online-users",
+            Object.keys(users)
+        );
 
-        console.log("🔴 User Disconnected:", socket.id);
+        console.log(
+            "🔴 User Disconnected:",
+            socket.id
+        );
 
     });
-        socket.on("typing", ({ sender, receiver }) => {
-    
-        const receiverSocket = users[receiver];
-    
-        if (receiverSocket) {
-    
-            io.to(receiverSocket).emit("typing", sender);
-    
+
+
+    socket.on(
+        "typing",
+        ({ sender, receiver }) => {
+
+            const receiverSocket =
+                users[receiver];
+
+            if (receiverSocket) {
+
+                io.to(receiverSocket).emit(
+                    "typing",
+                    sender
+                );
+
+            }
+
         }
-    
-    });
-    
-    socket.on("stop_typing", ({ sender, receiver }) => {
-    
-        const receiverSocket = users[receiver];
-    
-        if (receiverSocket) {
-    
-            io.to(receiverSocket).emit("stop_typing", sender);
-    
+    );
+
+
+    socket.on(
+        "stop_typing",
+        ({ sender, receiver }) => {
+
+            const receiverSocket =
+                users[receiver];
+
+            if (receiverSocket) {
+
+                io.to(receiverSocket).emit(
+                    "stop_typing",
+                    sender
+                );
+
+            }
+
         }
-    
-    });
+    );
+
+
     socket.on("send_message", (data) => {
 
-    const receiverSocket = users[data.receiver];
+        const receiverSocket =
+            users[data.receiver];
 
-    if (receiverSocket) {
+        if (receiverSocket) {
 
-        io.to(receiverSocket).emit("receive_message", data);
+            io.to(receiverSocket).emit(
+                "receive_message",
+                data
+            );
 
-    }
+        }
 
     });
 
 });
 
+
 server.listen(3000, () => {
-    console.log("🚀 Server is running on port 3000");
+
+    console.log(
+        "🚀 Server is running on port 3000"
+    );
+
 });
