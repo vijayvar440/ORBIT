@@ -134,6 +134,24 @@ router.put(
     userContoller.changePassword
 );
 
+router.post(
+    "/follow-request/:userId",
+    authMiddleware,
+    userContoller.sendFollowRequest
+);
+
+router.put(
+    "/follow-request/:requestId/accept",
+    authMiddleware,
+    userContoller.acceptFollowRequest
+);
+
+router.put(
+    "/follow-request/:requestId/reject",
+    authMiddleware,
+    userContoller.rejectFollowRequest
+);
+
 
 router.get(
     "/:postId",

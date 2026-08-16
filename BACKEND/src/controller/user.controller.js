@@ -2,6 +2,8 @@ const userModel = require("../model/user.model");
 const postModel = require("../model/post.model");
 const notificationModel = require("../model/notification.model");
 
+const followRequestModel = require("../model/followRequest.model");
+
 async function getProfile(req, res) {
     try {
         const userId = req.user.id;
@@ -410,6 +412,250 @@ async function changePassword(req, res) {
 
     }
 }
+// ===============================
+// ACCEPT FOLLOW REQUEST
+// ===============================
+
+async function acceptFollowRequest(req, res) {
+
+    try {
+
+        const receiverId = req.user.id;
+        const requestId = req.params.requestId;
+
+        const request =
+            await followRequestModel.findById(requestId);
+
+        if (!request) {
+            return res.status(404).json({
+                message: "Follow request not found"
+            });
+        }
+
+
+        if (
+            request.receiver.toString() !==
+            receiverId.toString()
+        ) {
+            return res.status(403).json({
+                message: "You cannot accept this request"
+            });
+        }
+
+
+        if (request.status !== "pending") {
+            return res.status(400).json({
+                message: "Request already processed"
+            });
+        }
+
+
+        const sender = await userModel.findById(
+            request.sender
+        );
+
+        const receiver = await userModel.findById(
+            request.receiver
+        );
+
+
+        if (!sender || !receiver) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+
+        // Add follower/following
+        if (
+            !receiver.followers.some(
+                id =>
+                    id.toString() ===
+                    sender._id.toString()
+            )
+        ) {
+            receiver.followers.push(sender._id);
+        }
+
+
+        if (
+            !sender.following.some(
+                id =>
+                    id.toString() ===
+                    receiver._id.toString()
+            )
+        ) {
+            sender.following.push(receiver._id);
+        }
+
+
+        request.status = "accepted";
+
+
+        await sender.save();
+        await receiver.save();
+        await request.save();
+
+
+        return res.status(200).json({
+            message: "Follow request accepted",
+            status: "following"
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return res.status(500).json({
+            message: err.message
+        });
+
+    }
+}
+// ===============================
+// SEND FOLLOW REQUEST
+// ===============================
+
+async function sendFollowRequest(req, res) {
+
+    try {
+
+        const senderId = req.user.id;
+        const receiverId = req.params.userId;
+
+        if (senderId.toString() === receiverId.toString()) {
+            return res.status(400).json({
+                message: "You cannot follow yourself"
+            });
+        }
+
+        const sender = await userModel.findById(senderId);
+        const receiver = await userModel.findById(receiverId);
+
+        if (!sender || !receiver) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+
+        // Already following?
+        const alreadyFollowing = sender.following.some(
+            id => id.toString() === receiverId.toString()
+        );
+
+        if (alreadyFollowing) {
+            return res.status(400).json({
+                message: "Already following this user"
+            });
+        }
+
+
+        // Check existing request
+        const existingRequest =
+            await followRequestModel.findOne({
+                sender: senderId,
+                receiver: receiverId,
+                status: "pending"
+            });
+
+        if (existingRequest) {
+            return res.status(400).json({
+                message: "Follow request already sent"
+            });
+        }
+
+
+        // PUBLIC ACCOUNT
+        if (!receiver.isPrivate) {
+
+            sender.following.push(receiverId);
+            receiver.followers.push(senderId);
+
+            await sender.save();
+            await receiver.save();
+
+            return res.status(200).json({
+                message: "User followed successfully",
+                status: "following"
+            });
+        }
+
+
+        // PRIVATE ACCOUNT
+        const request = await followRequestModel.create({
+            sender: senderId,
+            receiver: receiverId
+        });
+
+
+        return res.status(201).json({
+            message: "Follow request sent",
+            status: "requested",
+            request
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return res.status(500).json({
+            message: err.message
+        });
+
+    }
+}
+// ===============================
+// REJECT FOLLOW REQUEST
+// ===============================
+
+async function rejectFollowRequest(req, res) {
+
+    try {
+
+        const receiverId = req.user.id;
+        const requestId = req.params.requestId;
+
+        const request =
+            await followRequestModel.findById(requestId);
+
+        if (!request) {
+            return res.status(404).json({
+                message: "Follow request not found"
+            });
+        }
+
+
+        if (
+            request.receiver.toString() !==
+            receiverId.toString()
+        ) {
+            return res.status(403).json({
+                message: "You cannot reject this request"
+            });
+        }
+
+
+        request.status = "rejected";
+
+        await request.save();
+
+
+        return res.status(200).json({
+            message: "Follow request rejected",
+            status: "rejected"
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return res.status(500).json({
+            message: err.message
+        });
+
+    }
+}
 
 
 module.exports = {
@@ -422,5 +668,9 @@ module.exports = {
     getFollowing,
     getDiscoverUsers,
     updatePrivacy,
-    changePassword
+    changePassword,
+
+    sendFollowRequest,
+    acceptFollowRequest,
+    rejectFollowRequest
 };

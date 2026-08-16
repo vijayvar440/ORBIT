@@ -16,69 +16,159 @@ function UserProfile() {
     const [isMyProfile, setIsMyProfile] = useState(false);
     const [canViewPosts, setCanViewPosts] = useState(true);
     const [isPrivate, setIsPrivate] = useState(false);
+    const [followStatus, setFollowStatus] = useState("none");
+
 
    const fetchUserProfile = async () => {
-
     try {
 
         const response = await axios.get(
-    `http://localhost:3000/api/Post/user/${id}`,
-    {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
-        },
-        withCredentials: true
-    }
-);
-
-        setUser(response.data.user);
-         setPosts(response.data.posts || []);
-         
-         setIsPrivate(response.data.isPrivate || false);
-         setCanViewPosts(response.data.canViewPosts ?? true);
-
-        const loggedUserId = localStorage.getItem("userId");
-
-        setFollowing(
-            response.data.user.followers?.some((item) =>
-                String(item) === loggedUserId ||
-                String(item._id) === loggedUserId
-            )
+            `http://localhost:3000/api/Post/user/${id}`,
+            {
+                headers: {
+                    Authorization:
+                        `Bearer ${localStorage.getItem("token")}`
+                },
+                withCredentials: true
+            }
         );
 
-        setIsMyProfile(response.data.user._id === loggedUserId);
+        setUser(response.data.user);
+        setPosts(response.data.posts || []);
+
+        setIsPrivate(response.data.isPrivate || false);
+
+        setCanViewPosts(
+            response.data.canViewPosts ?? true
+        );
+
+        const loggedUserId =
+            localStorage.getItem("userId");
+
+
+
+
+        const isFollowing =
+            response.data.user.followers?.some(
+                (item) =>
+                    String(item) === String(loggedUserId) ||
+                    String(item._id) === String(loggedUserId)
+            );
+
+        setFollowing(!!isFollowing);
+
+
+   
+
+        if (isFollowing) {
+
+            setFollowStatus("following");
+
+        } else {
+
+            const isRequested =
+                response.data.user.followRequests?.some(
+                    (item) =>
+                        String(item) === String(loggedUserId) ||
+                        String(item._id) === String(loggedUserId)
+                );
+
+            setFollowStatus(
+                isRequested
+                    ? "requested"
+                    : "none"
+            );
+        }
+
+
+        setIsMyProfile(
+            String(response.data.user._id) ===
+            String(loggedUserId)
+        );
+
 
     } catch (err) {
 
-        console.log(err.response?.data || err.message);
+        console.log(
+            err.response?.data || err.message
+        );
 
     }
-
 };
 
 
     const handleFollow = async () => {
-
     try {
 
+        // Already following → unfollow
+        if (followStatus === "following") {
+
+            await axios.put(
+                `http://localhost:3000/api/Post/follow/${id}`,
+                {},
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${localStorage.getItem("token")}`
+                    }
+                }
+            );
+
+            setFollowStatus("none");
+            setFollowing(false);
+
+            fetchUserProfile();
+            return;
+        }
+
+        // Already requested
+        if (followStatus === "requested") {
+            return;
+        }
+
+        // Private account → send request
+        if (isPrivate) {
+
+            await axios.post(
+                `http://localhost:3000/api/Post/follow-request/${id}`,
+                {},
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${localStorage.getItem("token")}`
+                    }
+                }
+            );
+
+            setFollowStatus("requested");
+
+            return;
+        }
+
+        // Public account → direct follow
         await axios.put(
             `http://localhost:3000/api/Post/follow/${id}`,
             {},
             {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
+                    Authorization:
+                        `Bearer ${localStorage.getItem("token")}`
+                }
             }
         );
+
+        setFollowStatus("following");
+        setFollowing(true);
 
         fetchUserProfile();
 
     } catch (err) {
 
-        console.log(err.response?.data || err.message);
+        console.log(
+            err.response?.data || err.message
+        );
 
     }
-
 };
 
 
@@ -165,11 +255,16 @@ function UserProfile() {
 
         <div className="profile-actions">
 
-            <button
+             <button
                 className="edit-btn"
                 onClick={handleFollow}
+                disabled={followStatus === "requested"}
             >
-                {following ? "Following" : "Follow"}
+                {followStatus === "following"
+                    ? "Following"
+                    : followStatus === "requested"
+                    ? "Requested"
+                    : "Follow"}
             </button>
 
             {
