@@ -22,6 +22,8 @@ import Inbox from "./pages/Chat/Inbox";
 import Settings from './pages/setting/Setting'
 import Discover from "./pages/Discover/Discover";
 
+import Notifications from "./pages/Notifications/Notifications";
+
 
 
 
@@ -96,17 +98,28 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-         <Route
-           path="/setting"
-           element={
-        <ProtectedRoute>
-            <Settings />
-        </ProtectedRoute>
-    }
-/>
+                  <Route
+                    path="/setting"
+                  element={
+                  <ProtectedRoute>
+                      <Settings />
+                  </ProtectedRoute>
+                   }
+              />
+              <Route
+                path="/notifications"
+                element={
+                    <ProtectedRoute>
+                        <Notifications />
+                    </ProtectedRoute>
+                }
+            />
 
             </Routes>
         </>
+
+
+
     );
 }
 

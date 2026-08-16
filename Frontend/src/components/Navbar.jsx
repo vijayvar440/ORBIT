@@ -1,139 +1,254 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+
 import {
     House,
     Search,
     SquarePlus,
     CircleUserRound,
     MessageCircle,
-    Settings
-} from "lucide-react";      
+    Settings,
+    Bell
+} from "lucide-react";
 
 import "./Navbar.css";
 
 function Navbar() {
 
     const navigate = useNavigate();
+
     const [keyword, setKeyword] = useState("");
-     const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+
+    // =========================
+    // LOGOUT
+    // =========================
 
     const logout = () => {
+
         localStorage.removeItem("token");
         localStorage.removeItem("userId");
+
         navigate("/login");
     };
+
+
+    // =========================
+    // SEARCH USERS
+    // =========================
+
     const searchUser = async (value) => {
 
-    setKeyword(value);
+        setKeyword(value);
 
-    if (value.trim() === "") {
-        setUsers([]);
-        return;
-    }
+        if (value.trim() === "") {
+            setUsers([]);
+            return;
+        }
 
-    try {
+        try {
 
-        const response = await axios.get(
-            `http://localhost:3000/api/Post/search/${value}`
-        );
+            const response = await axios.get(
+                `http://localhost:3000/api/Post/search/${value}`
+            );
 
-        setUsers(response.data.users);
+            setUsers(response.data.users);
 
-    } catch (err) {
+        } catch (err) {
 
-        console.log(err);
+            console.log(err);
 
-    }
-};
+        }
+    };
+
+
+    // =========================
+    // GET UNREAD NOTIFICATIONS
+    // =========================
+
+    const fetchUnreadNotifications = async () => {
+
+        try {
+
+            const response = await axios.get(
+                "http://localhost:3000/api/notification/unread-count",
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${localStorage.getItem("token")}`
+                    }
+                }
+            );
+
+            setUnreadCount(response.data.count);
+
+        } catch (err) {
+
+            console.log(
+                "Notification Error:",
+                err.response?.data || err.message
+            );
+
+        }
+
+    };
+
+
+    // =========================
+    // LOAD NOTIFICATION COUNT
+    // =========================
+
+    useEffect(() => {
+
+        const token = localStorage.getItem("token");
+
+        if (token) {
+            fetchUnreadNotifications();
+        }
+
+    }, []);
+
 
     return (
 
         <nav className="navbar">
 
-        <div className="logo">
-    Orbit<span>.</span>
-</div>
 
-            
-<div className="search">
+            {/* LOGO */}
 
-    <Search size={18} />
+            <div className="logo">
+                Orbit<span>.</span>
+            </div>
 
-    <input
-        type="text"
-        placeholder="Search users..."
-        value={keyword}
-        onChange={(e) => searchUser(e.target.value)}
-    />
 
-    {users.length > 0 && (
+            {/* SEARCH */}
 
-        <div className="search-result">
+            <div className="search">
 
-            {users.map((user) => (
-                     <div
-                        key={user._id}
-                        className="search-user"
-                       onClick={() => {
-                         navigate(`/user/${user._id}`);
-                         setKeyword("");
-                         setUsers([]);
-                     }}
-                    >
+                <Search size={18} />
 
-                    <img
-                        src={
-                            user.profileImage ||
-                            "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                        }
-                        alt=""
-                    />
+                <input
+                    type="text"
+                    placeholder="Search users..."
+                    value={keyword}
+                    onChange={(e) =>
+                        searchUser(e.target.value)
+                    }
+                />
 
-                    <div>
-                        <h4>{user.username}</h4>
-                        <p>{user.bio}</p>
+
+                {users.length > 0 && (
+
+                    <div className="search-result">
+
+                        {users.map((user) => (
+
+                            <div
+                                key={user._id}
+                                className="search-user"
+                                onClick={() => {
+
+                                    navigate(
+                                        `/user/${user._id}`
+                                    );
+
+                                    setKeyword("");
+                                    setUsers([]);
+
+                                }}
+                            >
+
+                                <img
+                                    src={
+                                        user.profileImage ||
+                                        "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                                    }
+                                    alt=""
+                                />
+
+                                <div>
+
+                                    <h4>
+                                        {user.username}
+                                    </h4>
+
+                                    <p>
+                                        {user.bio}
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        ))}
+
                     </div>
 
-                </div>
+                )}
 
-            ))}
+            </div>
 
-        </div>
 
-    )}
-
-</div>
-
+            {/* NAV MENU */}
 
             <div className="nav-menu">
 
-    <Link to="/">
-        <House size={22}/>
-        <span>Home</span>
-    </Link>
 
-    <Link to="/create-post">
-        <SquarePlus size={22}/>
-        <span>Create</span>
-    </Link>
+                <Link to="/">
+                    <House size={22} />
+                    <span>Home</span>
+                </Link>
 
-    <Link to="/messages">
-        <MessageCircle size={22}/>
-        <span>Messages</span>
-    </Link>
 
-    <Link to="/profile">
-        <CircleUserRound size={22}/>
-        <span>Profile</span>
-    </Link>
+                <Link to="/create-post">
+                    <SquarePlus size={22} />
+                    <span>Create</span>
+                </Link>
 
-<Link to="/setting">
-    <Settings size={21} />
-    <span>Settings</span>
-</Link>
 
-</div>
+                <Link to="/messages">
+                    <MessageCircle size={22} />
+                    <span>Messages</span>
+                </Link>
+
+
+                <Link to="/notifications" className="notification-link">
+
+                    <Bell size={22} />
+
+                    {unreadCount > 0 && (
+
+                        <span className="notification-badge">
+
+                            {unreadCount > 99
+                                ? "99+"
+                                : unreadCount}
+
+                        </span>
+
+                    )}
+
+                    <span>Notifications</span>
+
+                </Link>
+
+
+                <Link to="/profile">
+                    <CircleUserRound size={22} />
+                    <span>Profile</span>
+                </Link>
+
+
+                <Link to="/setting">
+                    <Settings size={21} />
+                    <span>Settings</span>
+                </Link>
+
+
+            </div>
 
         </nav>
 

@@ -1,5 +1,6 @@
 const postModel = require("../model/post.model");
 const userModel = require("../model/user.model");
+const notificationModel = require("../model/notification.model");
 
 async function creatPost(req, res) {
     try {
@@ -268,6 +269,21 @@ async function addComment(req, res) {
 
         await post.save();
 
+
+        
+        if (String(post.uploadedBy) !== String(userId)) {
+
+            await notificationModel.create({
+                receiver: post.uploadedBy,
+                sender: userId,
+                type: "comment",
+                message: "commented on your post",
+                post: postId
+            });
+
+        }
+
+
         return res.status(200).json({
             message: "Comment Added Successfully",
             comments: post.comments
@@ -280,9 +296,9 @@ async function addComment(req, res) {
         return res.status(500).json({
             message: err.message
         });
+
     }
 }
-
 async function updatePost(req,res) {
     try{
         const postId = req.params.id;

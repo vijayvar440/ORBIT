@@ -1,5 +1,6 @@
 const userModel = require("../model/user.model");
 const postModel = require("../model/post.model");
+const notificationModel = require("../model/notification.model");
 
 async function getProfile(req, res) {
     try {
@@ -205,19 +206,26 @@ async function followUser(req, res) {
                 message: "User Unfollowed Successfully"
             });
 
-        } else {
+       } else {
 
-        
-            loggedUser.following.push(targetUserId);
-            targetUser.followers.push(loggedUserId);
+    loggedUser.following.push(targetUserId);
+    targetUser.followers.push(loggedUserId);
 
-            await loggedUser.save();
-            await targetUser.save();
+    await loggedUser.save();
+    await targetUser.save();
 
-            return res.status(200).json({
-                message: "User Followed Successfully"
-            });
-        }
+    // 🔔 Notification
+    await notificationModel.create({
+        receiver: targetUserId,
+        sender: loggedUserId,
+        type: "follow",
+        message: "started following you"
+    });
+
+    return res.status(200).json({
+        message: "User Followed Successfully"
+    });
+}
 
     } catch (err) {
 
