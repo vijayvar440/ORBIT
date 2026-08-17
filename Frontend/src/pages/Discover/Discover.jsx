@@ -58,6 +58,7 @@ function Discover() {
                     }
                 }
             );
+            localStorage.setItem("orbitHasFollowed", "true");
 
             console.log(response.data);
 

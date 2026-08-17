@@ -5,41 +5,60 @@ import "./Home.css";
 
 function Home() {
 
-   const [posts, setPosts] = useState([]);
-const [comments, setComments] = useState({});
-const [showMore, setShowMore] = useState({});
-const [following, setFollowing] = useState([]);
-const [loggedUserId, setLoggedUserId] = useState("");
-const [loadingUser, setLoadingUser] = useState("");
+    const [posts, setPosts] = useState([]);
+    const [comments, setComments] = useState({});
+    const [showMore, setShowMore] = useState({});
+    const [following, setFollowing] = useState([]);
+    const [loggedUserId, setLoggedUserId] = useState("");
+    const [loadingUser, setLoadingUser] = useState("");
+    const [hasFollowedFirstUser, setHasFollowedFirstUser] = useState(false);
+const [hasCreatedFirstPost, setHasCreatedFirstPost] = useState(false);
+    
 
     const navigate = useNavigate();
 
     const userId = localStorage.getItem("userId");
 
+
     const fetchPosts = async () => {
 
         try {
 
-           const response = await axios.get(
-    "http://localhost:3000/api/post/all-posts",
-    {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-    }
-);
+            const response = await axios.get(
+                "http://localhost:3000/api/post/all-posts",
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
 
-            setPosts(response.data.posts);
-             setFollowing(response.data.following);
-             setLoggedUserId(response.data.loggedUserId);
+            setPosts(response.data.posts || []);
+
+            setFollowing(response.data.following || []);
+
+            setLoggedUserId(
+                response.data.loggedUserId || ""
+            );  
+            setHasFollowedFirstUser(
+             response.data.hasFollowedFirstUser === true
+         );
+         
+         setHasCreatedFirstPost(
+             response.data.hasCreatedFirstPost === true
+         );
 
         } catch (err) {
 
-            console.log(err.response?.data || err.message);
+            console.log(
+                err.response?.data || err.message
+            );
 
         }
 
     };
+
 
     useEffect(() => {
 
@@ -47,6 +66,8 @@ const [loadingUser, setLoadingUser] = useState("");
 
     }, []);
 
+
+    
     const handleLike = async (postId) => {
 
         try {
@@ -58,14 +79,10 @@ const [loadingUser, setLoadingUser] = useState("");
                 {},
 
                 {
-
                     headers: {
-
                         Authorization:
-                            `Bearer ${localStorage.getItem("token")}`
-
-                    }
-
+                            `Bearer ${localStorage.getItem("token")}`,
+                    },
                 }
 
             );
@@ -74,12 +91,16 @@ const [loadingUser, setLoadingUser] = useState("");
 
         } catch (err) {
 
-            console.log(err.response?.data || err.message);
+            console.log(
+                err.response?.data || err.message
+            );
 
         }
 
     };
 
+
+   
     const handleDelete = async (postId) => {
 
         try {
@@ -89,14 +110,10 @@ const [loadingUser, setLoadingUser] = useState("");
                 `http://localhost:3000/api/post/delete/${postId}`,
 
                 {
-
                     headers: {
-
                         Authorization:
-                            `Bearer ${localStorage.getItem("token")}`
-
-                    }
-
+                            `Bearer ${localStorage.getItem("token")}`,
+                    },
                 }
 
             );
@@ -107,17 +124,22 @@ const [loadingUser, setLoadingUser] = useState("");
 
         } catch (err) {
 
-            console.log(err.response?.data || err.message);
+            console.log(
+                err.response?.data || err.message
+            );
 
         }
 
     };
 
+
     const handleComment = async (postId) => {
 
         const text = comments[postId];
 
-        if (!text?.trim()) return;
+        if (!text?.trim()) {
+            return;
+        }
 
         try {
 
@@ -125,378 +147,525 @@ const [loadingUser, setLoadingUser] = useState("");
 
                 `http://localhost:3000/api/post/comment/${postId}`,
 
-                { text },
+                {
+                    text
+                },
 
                 {
-
                     headers: {
-
                         Authorization:
-                            `Bearer ${localStorage.getItem("token")}`
-
-                    }
-
+                            `Bearer ${localStorage.getItem("token")}`,
+                    },
                 }
 
             );
 
             setComments((prev) => ({
-
                 ...prev,
-
                 [postId]: ""
-
             }));
 
             fetchPosts();
 
         } catch (err) {
 
-            console.log(err.response?.data || err.message);
+            console.log(
+                err.response?.data || err.message
+            );
 
         }
 
     };
-const handleFollow = async (userId) => {
-    try {
 
-        setLoadingUser(userId);
 
-        await axios.put(
-            `http://localhost:3000/api/post/follow/${userId}`,
-            {},
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            }
-        );
+    
+    const handleFollow = async (targetUserId) => {
 
-        await fetchPosts();
+        try {
 
-    } catch (err) {
+            setLoadingUser(targetUserId);
 
-        console.log(err.response?.data || err.message);
+            await axios.put(
 
-    } finally {
+                `http://localhost:3000/api/post/follow/${targetUserId}`,
 
-        setLoadingUser("");
+                {},
 
-    }
-};
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+
+            );
+
+            await fetchPosts();
+
+        } catch (err) {
+
+            console.log(
+                err.response?.data || err.message
+            );
+
+        } finally {
+
+            setLoadingUser("");
+
+        }
+
+    };
+
+
+ 
+
+
+
+    const showWelcomeCard =
+    !hasFollowedFirstUser &&
+    !hasCreatedFirstPost;
+
 
     return (
 
         <div className="home-container">
 
             <div className="feed">
-                {posts.length === 0 && (
-    <div className="welcome-card">
 
-        <div className="welcome-icon">
-            🚀
-        </div>
 
-        <h1>Welcome to ORBIT! 👋</h1>
 
-        <p>
-            Your account is ready.
-            Start connecting with people and sharing your world.
-        </p>
+                {showWelcomeCard && (
 
-        <div className="welcome-actions">
+                    <div className="welcome-card">
 
-            <button
-                onClick={() => navigate("/create-post")}
-            >
-                ➕ Create Your First Post
-            </button>
+                        <div className="welcome-icon">
+                            🚀
+                        </div>
 
-            <button
-                onClick={() => navigate("/users")}
-            >
-                👥 Discover People
-            </button>
+                        <h1>
+                            Welcome to ORBIT! 👋
+                        </h1>
 
-        </div>
+                        <p>
+                            Your account is ready.
+                            Start connecting with people
+                            and sharing your world.
+                        </p>
 
-    </div>
-)}
+                        <div className="welcome-actions">
 
-                {
+                            <button
+                                onClick={() =>
+                                    navigate("/create-post")
+                                }
+                            >
+                                ➕ Create Your First Post
+                            </button>
 
-                    posts.map((post) => (
 
-                        <div
+                            <button
+                                onClick={() =>
+                                    navigate("/users")
+                                }
+                            >
+                                👥 Discover People
+                            </button>
 
-                            key={post._id}
+                        </div>
 
-                            className="post"
+                    </div>
 
-                           
-                        >
+                )}
 
-                        
-<div className="post-header">
 
-    <div
-        className="user"
-        onClick={() => navigate(`/user/${post.uploadedBy._id}`)}
-    >
+          
 
-        {post.uploadedBy?.profileImage ? (
+                {posts.map((post) => (
 
-            <img
-                src={post.uploadedBy.profileImage}
-                alt="profile"
-                className="profile"
-            />
+                    <div
+                        key={post._id}
+                        className="post"
+                    >
 
-        ) : (
 
-            <div className="profile">
-                {post.uploadedBy?.username?.charAt(0).toUpperCase()}
-            </div>
+                        {/* =========================
+                            POST HEADER
+                        ========================= */}
 
-        )}
+                        <div className="post-header">
 
-        <div>
+                            <div
+                                className="user"
+                                onClick={() =>
+                                    navigate(
+                                        `/user/${post.uploadedBy?._id}`
+                                    )
+                                }
+                            >
 
-            <h3>{post.uploadedBy?.username}</h3>
+                                {post.uploadedBy?.profileImage ? (
 
-            <span>
-                {new Date(post.createdAt).toLocaleDateString()}
-            </span>
-
-        </div>
-
-    </div>
-
-    {String(post.uploadedBy._id) !== String(loggedUserId) && (
-
-      <button
-    className={
-        following.some(
-            (id) => String(id) === String(post.uploadedBy._id)
-        )
-            ? "follow-btn following-btn"
-            : "follow-btn"
-    }
-
-    disabled={loadingUser === post.uploadedBy._id}
-
-    onClick={(e) => {
-
-        e.stopPropagation();
-
-        handleFollow(post.uploadedBy._id);
-
-    }}
->
-
-    {
-        loadingUser === post.uploadedBy._id
-            ? "Loading..."
-            : following.some(
-                (id) => String(id) === String(post.uploadedBy._id)
-              )
-                ? "Following"
-                : "Follow"
-    }
-
-</button>
-    )}
-
-</div>
-
-                            {/* Title */}
-
-                            <h2>
-
-                                {post.title}
-
-                            </h2>
-
-                            {/* Description */}
-
-                            <p>
-
-                                {post.description}
-
-                            </p>
-                          {/* Media */}
-
-                            {post.mediaType === "image" && (
-                             
-                             <img
-                            src={post.media}
-                            alt={post.title}
-                            className="post-image"
-                            onDoubleClick={(e)=>{
-                                e.stopPropagation();
-                                handleLike(post._id);
-                            }}
-                        />
-                             
-                             
-                            )}
-
-                            {post.mediaType === "video" && (
-                                <video
-                                  controls
-                                  className="media"
-                                  onDoubleClick={(e) => {
-                                      e.stopPropagation();
-                                      handleLike(post._id);
-                                  }}
-                              >
-                                  <source
-                                      src={post.media}
-                                      type="video/mp4"
-                                  />
-                              </video>
-                            )}
-
-                            {post.mediaType === "audio" && (
-                                <audio controls className="audio">
-                                    <source
-                                        src={post.media}
-                                        type="audio/mpeg"
+                                    <img
+                                        src={
+                                            post.uploadedBy.profileImage
+                                        }
+                                        alt="profile"
+                                        className="profile"
                                     />
-                                </audio>
-                            )}
 
-                            {/* Actions */}
+                                ) : (
 
-                            <div className="actions">
+                                    <div className="profile">
 
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleLike(post._id);
-                                    }}
-                                >
-                                    ❤️ {post.likes?.length || 0}
-                                </button>
-                                <button
-                                   onClick={() => navigate(`/post/${post._id}`)}
-                               >
-                                   💬 {post.comments?.length || 0}
-                               </button>
+                                        {post.uploadedBy?.username
+                                            ?.charAt(0)
+                                            .toUpperCase()}
 
-
-                                {String(post.uploadedBy?._id) ===
-                                    String(userId) && (
-                                    <>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigate(
-                                                    `/edit-post/${post._id}`
-                                                );
-                                            }}
-                                        >
-                                            ✏️ Edit
-                                        </button>
-
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDelete(post._id);
-                                            }}
-                                        >
-                                            🗑 Delete
-                                        </button>
-                                    </>
-                                )}
-                            </div>
-
-                            {/* Comments */}
-
-                            <div className="comments">
-
-                                {(showMore[post._id]
-                                    ? post.comments
-                                    : post.comments?.slice(0, 1)
-                                )?.map((c, index) => (
-
-                                    <div
-                                        key={index}
-                                        className="comment-box"
-                                    >
-                                        {c.text}
                                     </div>
 
-                                ))}
+                                )}
 
-                                {post.comments?.length > 1 && (
+
+                                <div>
+
+                                    <h3>
+                                        {
+                                            post.uploadedBy
+                                                ?.username
+                                        }
+                                    </h3>
+
+                                    <span>
+                                        {new Date(
+                                            post.createdAt
+                                        ).toLocaleDateString()}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+
+                            {String(
+                                post.uploadedBy?._id
+                            ) !== String(loggedUserId) && (
+
+                                <button
+
+                                    className={
+                                        following.some(
+                                            (id) =>
+                                                String(id) ===
+                                                String(
+                                                    post.uploadedBy?._id
+                                                )
+                                        )
+                                            ? "follow-btn following-btn"
+                                            : "follow-btn"
+                                    }
+
+
+                                    disabled={
+                                        loadingUser ===
+                                        post.uploadedBy?._id
+                                    }
+
+
+                                    onClick={(e) => {
+
+                                        e.stopPropagation();
+
+                                        handleFollow(
+                                            post.uploadedBy?._id
+                                        );
+
+                                    }}
+
+                                >
+
+                                    {
+                                        loadingUser ===
+                                        post.uploadedBy?._id
+
+                                            ? "Loading..."
+
+                                            : following.some(
+                                                (id) =>
+                                                    String(id) ===
+                                                    String(
+                                                        post.uploadedBy?._id
+                                                    )
+                                            )
+
+                                                ? "Following"
+
+                                                : "Follow"
+                                    }
+
+                                </button>
+
+                            )}
+
+                        </div>
+
+
+                   
+
+                        <h2>
+                            {post.title}
+                        </h2>
+
+
+                    
+
+                        <p>
+                            {post.description}
+                        </p>
+
+
+                  
+
+                        {post.mediaType === "image" && (
+
+                            <img
+                                src={post.media}
+                                alt={post.title}
+                                className="post-image"
+
+                                onDoubleClick={(e) => {
+
+                                    e.stopPropagation();
+
+                                    handleLike(post._id);
+
+                                }}
+                            />
+
+                        )}
+
+
+                    
+
+                        {post.mediaType === "video" && (
+
+                            <video
+                                controls
+                                className="media"
+
+                                onDoubleClick={(e) => {
+
+                                    e.stopPropagation();
+
+                                    handleLike(post._id);
+
+                                }}
+                            >
+
+                                <source
+                                    src={post.media}
+                                    type="video/mp4"
+                                />
+
+                            </video>
+
+                        )}
+
+
+        
+
+                        {post.mediaType === "audio" && (
+
+                            <audio
+                                controls
+                                className="audio"
+                            >
+
+                                <source
+                                    src={post.media}
+                                    type="audio/mpeg"
+                                />
+
+                            </audio>
+
+                        )}
+
+
+                      
+
+                        <div className="actions">
+
+                            <button
+                                onClick={(e) => {
+
+                                    e.stopPropagation();
+
+                                    handleLike(post._id);
+
+                                }}
+                            >
+                                ❤️ {post.likes?.length || 0}
+                            </button>
+
+
+                            <button
+                                onClick={() =>
+                                    navigate(
+                                        `/post/${post._id}`
+                                    )
+                                }
+                            >
+                                💬 {post.comments?.length || 0}
+                            </button>
+
+
+                            {/* EDIT + DELETE */}
+
+                            {String(
+                                post.uploadedBy?._id
+                            ) === String(userId) && (
+
+                                <>
 
                                     <button
-                                        className="show-more-btn"
                                         onClick={(e) => {
 
                                             e.stopPropagation();
 
-                                            setShowMore((prev) => ({
-                                                ...prev,
-                                                [post._id]:
-                                                    !prev[post._id],
-                                            }));
+                                            navigate(
+                                                `/edit-post/${post._id}`
+                                            );
 
                                         }}
                                     >
-                                        {showMore[post._id]
-                                            ? "Show Less"
-                                            : "Show More"}
+                                        ✏️ Edit
                                     </button>
 
-                                )}
 
-                            </div>
+                                    <button
+                                        onClick={(e) => {
 
-                        
+                                            e.stopPropagation();
 
-                            <div className="comment-input-area">
+                                            handleDelete(
+                                                post._id
+                                            );
 
-                                <input
-                                    type="text"
-                                    placeholder="Write a comment..."
-                                    value={
-                                        comments[post._id] || ""
-                                    }
-                                    onClick={(e) =>
-                                        e.stopPropagation()
-                                    }
-                                    onChange={(e) =>
-                                        setComments((prev) => ({
-                                            ...prev,
-                                            [post._id]:
-                                                e.target.value,
-                                        }))
-                                    }
-                                />
+                                        }}
+                                    >
+                                        🗑 Delete
+                                    </button>
+
+                                </>
+
+                            )}
+
+                        </div>
+
+
+                      
+
+                        <div className="comments">
+
+                            {(showMore[post._id]
+                                ? post.comments
+                                : post.comments?.slice(0, 1)
+                            )?.map((c, index) => (
+
+                                <div
+                                    key={index}
+                                    className="comment-box"
+                                >
+                                    {c.text}
+                                </div>
+
+                            ))}
+
+
+                            {post.comments?.length > 1 && (
 
                                 <button
+                                    className="show-more-btn"
+
                                     onClick={(e) => {
 
                                         e.stopPropagation();
 
-                                        handleComment(post._id);
+                                        setShowMore((prev) => ({
+
+                                            ...prev,
+
+                                            [post._id]:
+                                                !prev[post._id],
+
+                                        }));
 
                                     }}
                                 >
-                                    Post
+
+                                    {showMore[post._id]
+                                        ? "Show Less"
+                                        : "Show More"}
+
                                 </button>
 
-                            </div>
-
-                            <hr />
+                            )}
 
                         </div>
 
-                    ))
 
-                }
+                      
+
+                        <div className="comment-input-area">
+
+                            <input
+                                type="text"
+                                placeholder="Write a comment..."
+
+                                value={
+                                    comments[post._id] || ""
+                                }
+
+                                onClick={(e) =>
+                                    e.stopPropagation()
+                                }
+
+                                onChange={(e) =>
+                                    setComments((prev) => ({
+
+                                        ...prev,
+
+                                        [post._id]:
+                                            e.target.value,
+
+                                    }))
+                                }
+
+                            />
+
+
+                            <button
+                                onClick={(e) => {
+
+                                    e.stopPropagation();
+
+                                    handleComment(
+                                        post._id
+                                    );
+
+                                }}
+                            >
+                                Post
+                            </button>
+
+                        </div>
+
+
+                        <hr />
+
+                    </div>
+
+                ))}
 
             </div>
 

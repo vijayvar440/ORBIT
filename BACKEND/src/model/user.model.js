@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    hasStarted: {
+    type: Boolean,
+    default: false
+},
 
     password: {
         type: String,
@@ -56,8 +60,16 @@ const userSchema = new mongoose.Schema({
     isPrivate: {
         type: Boolean,
         default: false
-    }
+    },
+   hasFollowedFirstUser: {
+    type: Boolean,
+    default: false
+},
 
+hasCreatedFirstPost: {
+    type: Boolean,
+    default: false
+},
 }, {
     timestamps: true
 });

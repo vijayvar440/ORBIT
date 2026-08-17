@@ -125,9 +125,13 @@ function Notifications() {
 const getIcon = (type) => {
 
     if (type === "like") return "❤️";
+
     if (type === "comment") return "💬";
+
     if (type === "follow") return "👤";
+
     if (type === "message") return "✉️";
+
     if (type === "broadcast") return "📢";
 
     return "🔔";
@@ -187,7 +191,9 @@ const getIcon = (type) => {
                                 <p>
 
                                     <strong>
-                                        {notification.sender?.username}
+                                        {notification.type === "broadcast"
+                                            ? "ORBIT"
+                                            : notification.sender?.username}
                                     </strong>{" "}
 
                                     {getIcon(notification.type)}{" "}

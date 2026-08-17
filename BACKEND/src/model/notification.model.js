@@ -4,13 +4,13 @@ const notificationSchema = new mongoose.Schema(
     {
         receiver: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "user",
+            ref: "User",
             required: true
         },
 
         sender: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "user",
+            ref: "User",
             required: true
         },
 
@@ -20,7 +20,8 @@ const notificationSchema = new mongoose.Schema(
                 "like",
                 "comment",
                 "follow",
-                "message"
+                "message",
+                "broadcast"
             ],
             required: true
         },
@@ -39,22 +40,9 @@ const notificationSchema = new mongoose.Schema(
         isRead: {
             type: Boolean,
             default: false
-        },
-        type: {
-    type: String,
-   type: {
-    type: String,
-    enum: [
-        "like",
-        "comment",
-        "follow",
-        "message",
-        "broadcast"
-    ],
-    required: true
-},
+        }
     },
-    
+    {
         timestamps: true
     }
 );

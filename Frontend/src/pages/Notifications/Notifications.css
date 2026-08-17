@@ -3,7 +3,13 @@
     max-width: 700px;
     margin: 30px auto;
     padding: 20px;
+    color: #222;
 }
+
+
+/* =========================
+   HEADER
+========================= */
 
 .notifications-header {
     display: flex;
@@ -14,6 +20,7 @@
 
 .notifications-header h2 {
     margin: 0;
+    color: inherit;
 }
 
 .notifications-header button {
@@ -24,7 +31,17 @@
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
+    transition: 0.2s;
 }
+
+.notifications-header button:hover {
+    background: #0d65d9;
+}
+
+
+/* =========================
+   LIST
+========================= */
 
 .notifications-list {
     display: flex;
@@ -32,59 +49,215 @@
     gap: 10px;
 }
 
+
+/* =========================
+   NOTIFICATION CARD
+========================= */
+
 .notification-item {
     position: relative;
     display: flex;
     align-items: center;
     gap: 14px;
+
     padding: 15px;
-    background: white;
+
+    background: #ffffff;
+    color: #222;
+
+    border: 1px solid #e5e7eb;
     border-radius: 12px;
+
     cursor: pointer;
-    transition: 0.2s;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .notification-item:hover {
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
 }
+
+
+/* =========================
+   UNREAD
+========================= */
 
 .notification-item.unread {
     background: #eaf3ff;
+    border-color: #b9d8ff;
 }
+
+
+/* =========================
+   PROFILE IMAGE
+========================= */
 
 .notification-item img {
     width: 50px;
     height: 50px;
+
+    flex-shrink: 0;
+
     border-radius: 50%;
     object-fit: cover;
 }
 
+
+/* =========================
+   CONTENT
+========================= */
+
 .notification-content {
     flex: 1;
+    min-width: 0;
 }
 
 .notification-content p {
     margin: 0;
+
     font-size: 15px;
+    line-height: 1.5;
+
     color: #333;
+}
+
+.notification-content strong {
+    color: #111;
 }
 
 .notification-content span {
     display: block;
+
     margin-top: 5px;
+
     font-size: 12px;
+
     color: #777;
 }
+
+
+/* =========================
+   UNREAD DOT
+========================= */
 
 .unread-dot {
     width: 9px;
     height: 9px;
+
+    flex-shrink: 0;
+
     background: #1877f2;
+
     border-radius: 50%;
 }
 
+
+/* =========================
+   EMPTY
+========================= */
+
 .no-notifications {
     text-align: center;
+
     padding: 60px 20px;
+
     color: #777;
+}
+
+.no-notifications h3 {
+    margin-bottom: 8px;
+}
+
+.no-notifications p {
+    margin: 0;
+}
+
+
+/* =====================================================
+   DARK MODE
+   Agar ThemeContext body par "dark" class lagata hai
+===================================================== */
+
+body.dark .notifications-container {
+    color: #f1f5f9;
+}
+
+body.dark .notification-item {
+    background: #182235;
+    color: #f1f5f9;
+
+    border-color: #29364d;
+
+    box-shadow: none;
+}
+
+body.dark .notification-item:hover {
+    background: #1d2a40;
+    border-color: #3a4a63;
+}
+
+body.dark .notification-item.unread {
+    background: #1d3557;
+    border-color: #315b8f;
+}
+
+body.dark .notification-content p {
+    color: #e5e7eb;
+}
+
+body.dark .notification-content strong {
+    color: #ffffff;
+}
+
+body.dark .notification-content span {
+    color: #9ca3af;
+}
+
+body.dark .no-notifications {
+    color: #9ca3af;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+    .notifications-container {
+        margin: 15px auto;
+        padding: 12px;
+    }
+
+    .notifications-header {
+        gap: 10px;
+    }
+
+    .notifications-header h2 {
+        font-size: 20px;
+    }
+
+    .notifications-header button {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .notification-item {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .notification-item img {
+        width: 44px;
+        height: 44px;
+    }
+
+    .notification-content p {
+        font-size: 14px;
+    }
 }

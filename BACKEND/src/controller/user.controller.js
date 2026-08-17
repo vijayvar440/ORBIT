@@ -185,21 +185,21 @@ async function followUser(req, res) {
             });
         }
 
-    
         const alreadyFollowing = loggedUser.following.some(
             id => id.toString() === targetUserId
         );
 
         if (alreadyFollowing) {
 
-            
-            loggedUser.following = loggedUser.following.filter(
-                id => id.toString() !== targetUserId
-            );
+            loggedUser.following =
+                loggedUser.following.filter(
+                    id => id.toString() !== targetUserId
+                );
 
-            targetUser.followers = targetUser.followers.filter(
-                id => id.toString() !== loggedUserId
-            );
+            targetUser.followers =
+                targetUser.followers.filter(
+                    id => id.toString() !== loggedUserId
+                );
 
             await loggedUser.save();
             await targetUser.save();
@@ -213,10 +213,12 @@ async function followUser(req, res) {
     loggedUser.following.push(targetUserId);
     targetUser.followers.push(loggedUserId);
 
+    // First follow complete
+    loggedUser.hasFollowedFirstUser = true;
+
     await loggedUser.save();
     await targetUser.save();
 
-    // 🔔 Notification
     await notificationModel.create({
         receiver: targetUserId,
         sender: loggedUserId,
@@ -238,30 +240,8 @@ async function followUser(req, res) {
         });
     }
 }
-async function getFollowers(req, res) {
-    try {
 
-        const user = await userModel.findById(req.params.userId)
-            .populate("followers", "username profileImage");
 
-        if (!user) {
-            return res.status(404).json({
-                message: "User not found"
-            });
-        }
-
-        return res.status(200).json({
-            followers: user.followers
-        });
-
-    } catch (err) {
-        console.log(err);
-
-        return res.status(500).json({
-            message: err.message
-        });
-    }
-}
 
 async function getFollowing(req, res) {
     try {
@@ -609,8 +589,11 @@ async function sendFollowRequest(req, res) {
 // REJECT FOLLOW REQUEST
 // ===============================
 
-async function rejectFollowRequest(req, res) {
+// ===============================
+// REJECT FOLLOW REQUEST
+// ===============================
 
+async function rejectFollowRequest(req, res) {
     try {
 
         const receiverId = req.user.id;
@@ -625,7 +608,6 @@ async function rejectFollowRequest(req, res) {
             });
         }
 
-
         if (
             request.receiver.toString() !==
             receiverId.toString()
@@ -635,11 +617,15 @@ async function rejectFollowRequest(req, res) {
             });
         }
 
+        if (request.status !== "pending") {
+            return res.status(400).json({
+                message: "Request already processed"
+            });
+        }
 
         request.status = "rejected";
 
         await request.save();
-
 
         return res.status(200).json({
             message: "Follow request rejected",
@@ -653,20 +639,60 @@ async function rejectFollowRequest(req, res) {
         return res.status(500).json({
             message: err.message
         });
-
     }
 }
 
+
+// ===============================
+// GET FOLLOWERS
+// ===============================
+
+async function getFollowers(req, res) {
+    try {
+
+        const user = await userModel
+            .findById(req.params.userId)
+            .populate(
+                "followers",
+                "username profileImage"
+            );
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            followers: user.followers
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return res.status(500).json({
+            message: err.message
+        });
+    }
+}
+
+
+// ===============================
+// EXPORTS
+// ===============================
 
 module.exports = {
     getProfile,
     updateProfile,
     searchUser,
     getUserProfile,
+
     followUser,
     getFollowers,
     getFollowing,
     getDiscoverUsers,
+
     updatePrivacy,
     changePassword,
 
