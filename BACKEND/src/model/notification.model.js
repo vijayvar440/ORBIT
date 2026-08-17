@@ -39,9 +39,22 @@ const notificationSchema = new mongoose.Schema(
         isRead: {
             type: Boolean,
             default: false
-        }
+        },
+        type: {
+    type: String,
+   type: {
+    type: String,
+    enum: [
+        "like",
+        "comment",
+        "follow",
+        "message",
+        "broadcast"
+    ],
+    required: true
+},
     },
-    {
+    
         timestamps: true
     }
 );

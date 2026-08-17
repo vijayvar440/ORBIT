@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
+
     username: {
         type: String,
         required: true
@@ -16,6 +17,13 @@ const userSchema = new mongoose.Schema({
         required: true
     },
 
+    // USER ROLE
+    role: {
+        type: String,
+        enum: ["user", "author"],
+        default: "user"
+    },
+
     profileImage: {
         type: String,
         default: ""
@@ -24,11 +32,6 @@ const userSchema = new mongoose.Schema({
     bio: {
         type: String,
         default: ""
-    },
-
-    role: {
-        type: String,
-        default: "user"
     },
 
     followers: [
@@ -44,14 +47,19 @@ const userSchema = new mongoose.Schema({
             ref: "User"
         }
     ],
+
     lastSeen: {
-    type: Date,
-    default: Date.now
-     },
-     isPrivate: {
-         type: Boolean,
-         default: false
-     }
-}, { timestamps: true });
+        type: Date,
+        default: Date.now
+    },
+
+    isPrivate: {
+        type: Boolean,
+        default: false
+    }
+
+}, {
+    timestamps: true
+});
 
 module.exports = mongoose.model("User", userSchema);

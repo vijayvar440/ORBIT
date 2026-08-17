@@ -23,6 +23,7 @@ import Settings from './pages/setting/Setting'
 import Discover from "./pages/Discover/Discover";
 
 import Notifications from "./pages/Notifications/Notifications";
+import Broadcast from "./pages/Author/Broadcast";
 
 
 
@@ -113,6 +114,11 @@ function App() {
                         <Notifications />
                     </ProtectedRoute>
                 }
+            />
+
+            <Route
+                path="/author/broadcast"
+                element={<Broadcast />}
             />
 
             </Routes>

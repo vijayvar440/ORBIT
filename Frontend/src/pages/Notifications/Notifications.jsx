@@ -122,21 +122,16 @@ function Notifications() {
 
     };
 
+const getIcon = (type) => {
 
-    const getIcon = (type) => {
+    if (type === "like") return "❤️";
+    if (type === "comment") return "💬";
+    if (type === "follow") return "👤";
+    if (type === "message") return "✉️";
+    if (type === "broadcast") return "📢";
 
-        if (type === "like") return "❤️";
-
-        if (type === "comment") return "💬";
-
-        if (type === "follow") return "👤";
-
-        if (type === "message") return "✉️";
-
-        return "🔔";
-
-    };
-
+    return "🔔";
+};
 
     return (
 

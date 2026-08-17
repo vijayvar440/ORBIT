@@ -9,6 +9,7 @@ function Settings() {
     const [isPrivate, setIsPrivate] = useState(false);
     const [loading, setLoading] = useState(false);
     const { theme, toggleTheme } = useTheme();
+    const [user, setUser] = useState(null);
     const navigate = useNavigate();
 
     const fetchPrivacy = async () => {
@@ -25,6 +26,7 @@ function Settings() {
             );
 
             setIsPrivate(response.data.user.isPrivate);
+            setUser(response.data.user);
 
         } catch (err) {
 
@@ -163,6 +165,22 @@ function Settings() {
                     </div>
 
                 </div>
+                {user?.role === "author" && (
+
+    <div className="settings-section">
+
+        <h2>👑 Author</h2>
+
+        <div
+            className="setting-link"
+            onClick={() => navigate("/author/broadcast")}
+        >
+            📢 Broadcast Notification
+        </div>
+
+    </div>
+
+)}
 
 
 

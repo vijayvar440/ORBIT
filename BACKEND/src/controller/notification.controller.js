@@ -1,10 +1,8 @@
 const notificationModel = require("../model/notification.model");
+const User = require("../model/user.model");
 
 
-// ===============================
-// CREATE NOTIFICATION
-// ===============================
-
+// CREATE NORMAL NOTIFICATION
 async function createNotification(req, res) {
 
     try {
@@ -42,10 +40,97 @@ async function createNotification(req, res) {
 }
 
 
-// ===============================
-// GET MY NOTIFICATIONS
-// ===============================
+// BROADCAST NOTIFICATION
+async function broadcastNotification(req, res) {
 
+    try {
+
+        // Only author can broadcast
+        if (req.user.role !== "author") {
+
+            return res.status(403).json({
+                message: "Only author can send broadcast notifications"
+            });
+
+        }
+
+        const { title, message } = req.body;
+
+        if (!title || !title.trim()) {
+
+            return res.status(400).json({
+                message: "Title is required"
+            });
+
+        }
+
+        if (!message || !message.trim()) {
+
+            return res.status(400).json({
+                message: "Message is required"
+            });
+
+        }
+
+        const sender = req.user.id;
+
+        // Get all users except author
+        const users = await User.find(
+            {
+                _id: { $ne: sender }
+            },
+            "_id"
+        );
+
+        if (users.length === 0) {
+
+            return res.status(400).json({
+                message: "No users found"
+            });
+
+        }
+
+        const notifications = users.map((user) => ({
+
+            receiver: user._id,
+
+            sender: sender,
+
+            type: "broadcast",
+
+            message: `${title.trim()}: ${message.trim()}`,
+
+            post: null,
+
+            isRead: false
+
+        }));
+
+        await notificationModel.insertMany(
+            notifications
+        );
+
+        return res.status(201).json({
+
+            message: "Broadcast notification sent successfully",
+
+            totalUsers: users.length
+
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return res.status(500).json({
+            message: err.message
+        });
+
+    }
+}
+
+
+// GET NOTIFICATIONS
 async function getNotifications(req, res) {
 
     try {
@@ -84,10 +169,7 @@ async function getNotifications(req, res) {
 }
 
 
-// ===============================
-// MARK ONE AS READ
-// ===============================
-
+// MARK AS READ
 async function markAsRead(req, res) {
 
     try {
@@ -130,10 +212,7 @@ async function markAsRead(req, res) {
 }
 
 
-// ===============================
 // MARK ALL AS READ
-// ===============================
-
 async function markAllAsRead(req, res) {
 
     try {
@@ -166,10 +245,7 @@ async function markAllAsRead(req, res) {
 }
 
 
-// ===============================
 // DELETE NOTIFICATION
-// ===============================
-
 async function deleteNotification(req, res) {
 
     try {
@@ -194,12 +270,39 @@ async function deleteNotification(req, res) {
 
     }
 }
+async function getUnreadCount(req, res) {
+
+    try {
+
+        const userId = req.user.id;
+
+        const count = await notificationModel.countDocuments({
+            receiver: userId,
+            isRead: false
+        });
+
+        return res.status(200).json({
+            count
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return res.status(500).json({
+            message: err.message
+        });
+
+    }
+}
 
 
 module.exports = {
     createNotification,
+    broadcastNotification,
     getNotifications,
     markAsRead,
     markAllAsRead,
-    deleteNotification
+    deleteNotification,
+    getUnreadCount
 };

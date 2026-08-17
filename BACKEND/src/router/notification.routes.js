@@ -36,5 +36,15 @@ router.delete(
     authMiddleware,
     notificationController.deleteNotification
 );
+router.post(
+    "/broadcast",
+    authMiddleware,
+    notificationController.broadcastNotification
+);
+router.get(
+    "/unread-count",
+    authMiddleware,
+    notificationController.getUnreadCount
+);
 
 module.exports = router;
