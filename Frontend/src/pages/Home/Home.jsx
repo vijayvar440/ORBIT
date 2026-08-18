@@ -13,6 +13,7 @@ function Home() {
     const [loadingUser, setLoadingUser] = useState("");
     const [hasFollowedFirstUser, setHasFollowedFirstUser] = useState(false);
     const [hasCreatedFirstPost, setHasCreatedFirstPost] = useState(false);
+    const [loadingPosts, setLoadingPosts] = useState(true);
     
 
     const navigate = useNavigate();
@@ -49,6 +50,8 @@ const fetchPosts = async () => {
         console.log(
             err.response?.data || err.message
         );
+    } finally {
+        setLoadingPosts(false);
     }
 };
 
@@ -230,7 +233,7 @@ const showWelcomeCard =
 
 
 
-                {showWelcomeCard && (
+                {!loadingPosts && showWelcomeCard && (
 
                     <div className="welcome-card">
 
