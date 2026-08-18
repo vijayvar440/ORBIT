@@ -36,6 +36,7 @@ async function creatPost(req, res) {
             mediaType,
             uploadedBy: userId
         });
+
        await userModel.findByIdAndUpdate(
     userId,
     {
@@ -44,13 +45,6 @@ async function creatPost(req, res) {
 
 );
 
-        // User ne first post create kar diya
-        const loggedUser = await userModel.findById(userId);
-
-        if (loggedUser) {
-            loggedUser.hasCreatedFirstPost = true;
-            await loggedUser.save();
-        }
 
         console.log("===== SAVED POST =====");
         console.log(post);

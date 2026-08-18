@@ -11,17 +11,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    hasStarted: {
-    type: Boolean,
-    default: false
-},
 
     password: {
         type: String,
         required: true
     },
 
-    // USER ROLE
     role: {
         type: String,
         enum: ["user", "author"],
@@ -61,15 +56,19 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-   hasFollowedFirstUser: {
-    type: Boolean,
-    default: false
-},
 
-hasCreatedFirstPost: {
-    type: Boolean,
-    default: false
-},
+    // First follow ke baad permanently true
+    hasFollowedFirstUser: {
+        type: Boolean,
+        default: false
+    },
+
+    // First post ke baad permanently true
+    hasCreatedFirstPost: {
+        type: Boolean,
+        default: false
+    }
+
 }, {
     timestamps: true
 });

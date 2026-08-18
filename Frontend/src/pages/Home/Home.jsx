@@ -12,60 +12,50 @@ function Home() {
     const [loggedUserId, setLoggedUserId] = useState("");
     const [loadingUser, setLoadingUser] = useState("");
     const [hasFollowedFirstUser, setHasFollowedFirstUser] = useState(false);
-const [hasCreatedFirstPost, setHasCreatedFirstPost] = useState(false);
+    const [hasCreatedFirstPost, setHasCreatedFirstPost] = useState(false);
     
 
     const navigate = useNavigate();
 
     const userId = localStorage.getItem("userId");
 
+const fetchPosts = async () => {
+    try {
+        const response = await axios.get(
+            "http://localhost:3000/api/post/all-posts",
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            }
+        );
 
-    const fetchPosts = async () => {
+        setPosts(response.data.posts || []);
+        setFollowing(response.data.following || []);
 
-        try {
+        setLoggedUserId(
+            response.data.loggedUserId || ""
+        );
 
-            const response = await axios.get(
-                "http://localhost:3000/api/post/all-posts",
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${localStorage.getItem("token")}`,
-                    },
-                }
-            );
+        setHasFollowedFirstUser(
+            response.data.hasFollowedFirstUser || false
+        );
 
-            setPosts(response.data.posts || []);
+        setHasCreatedFirstPost(
+            response.data.hasCreatedFirstPost || false
+        );
 
-            setFollowing(response.data.following || []);
-
-            setLoggedUserId(
-                response.data.loggedUserId || ""
-            );  
-            setHasFollowedFirstUser(
-             response.data.hasFollowedFirstUser === true
-         );
-         
-         setHasCreatedFirstPost(
-             response.data.hasCreatedFirstPost === true
-         );
-
-        } catch (err) {
-
-            console.log(
-                err.response?.data || err.message
-            );
-
-        }
-
-    };
+    } catch (err) {
+        console.log(
+            err.response?.data || err.message
+        );
+    }
+};
 
 
-    useEffect(() => {
-
-        fetchPosts();
-
-    }, []);
-
+useEffect(() => {
+    fetchPosts();
+}, []);
 
     
     const handleLike = async (postId) => {
@@ -220,11 +210,17 @@ const [hasCreatedFirstPost, setHasCreatedFirstPost] = useState(false);
  
 
 
+const hasOwnPost = posts.some(
+    (post) =>
+        String(post.uploadedBy?._id) ===
+        String(loggedUserId || userId)
+);
 
-    const showWelcomeCard =
+const showWelcomeCard =
     !hasFollowedFirstUser &&
-    !hasCreatedFirstPost;
-
+    !hasCreatedFirstPost &&
+    following.length === 0 &&
+    !hasOwnPost;
 
     return (
 

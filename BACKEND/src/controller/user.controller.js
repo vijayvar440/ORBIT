@@ -189,6 +189,7 @@ async function followUser(req, res) {
             id => id.toString() === targetUserId
         );
 
+      
         if (alreadyFollowing) {
 
             loggedUser.following =
@@ -207,29 +208,30 @@ async function followUser(req, res) {
             return res.status(200).json({
                 message: "User Unfollowed Successfully"
             });
+        }
 
-       } else {
+     
 
-    loggedUser.following.push(targetUserId);
-    targetUser.followers.push(loggedUserId);
+        loggedUser.following.push(targetUserId);
+        targetUser.followers.push(loggedUserId);
 
-    // First follow complete
-    loggedUser.hasFollowedFirstUser = true;
+     
+        loggedUser.hasFollowedFirstUser = true;
 
-    await loggedUser.save();
-    await targetUser.save();
+        await loggedUser.save();
+        await targetUser.save();
 
-    await notificationModel.create({
-        receiver: targetUserId,
-        sender: loggedUserId,
-        type: "follow",
-        message: "started following you"
-    });
+      
+        await notificationModel.create({
+            receiver: targetUserId,
+            sender: loggedUserId,
+            type: "follow",
+            message: "started following you"
+        });
 
-    return res.status(200).json({
-        message: "User Followed Successfully"
-    });
-}
+        return res.status(200).json({
+            message: "User Followed Successfully"
+        });
 
     } catch (err) {
 
@@ -240,7 +242,6 @@ async function followUser(req, res) {
         });
     }
 }
-
 
 
 async function getFollowing(req, res) {
@@ -301,6 +302,8 @@ async function getDiscoverUsers(req, res) {
         });
     }
 }
+
+
 async function updatePrivacy(req, res) {
     try {
 
@@ -392,9 +395,6 @@ async function changePassword(req, res) {
 
     }
 }
-// ===============================
-// ACCEPT FOLLOW REQUEST
-// ===============================
 
 async function acceptFollowRequest(req, res) {
 
@@ -458,7 +458,8 @@ async function acceptFollowRequest(req, res) {
         }
 
 
-        if (
+
+       if (
             !sender.following.some(
                 id =>
                     id.toString() ===
@@ -467,11 +468,12 @@ async function acceptFollowRequest(req, res) {
         ) {
             sender.following.push(receiver._id);
         }
-
-
+        
+        // First follow permanently remember
+        sender.hasFollowedFirstUser = true;
+        
         request.status = "accepted";
-
-
+        
         await sender.save();
         await receiver.save();
         await request.save();
@@ -492,9 +494,7 @@ async function acceptFollowRequest(req, res) {
 
     }
 }
-// ===============================
-// SEND FOLLOW REQUEST
-// ===============================
+
 
 async function sendFollowRequest(req, res) {
 
@@ -547,14 +547,17 @@ async function sendFollowRequest(req, res) {
 
 
         // PUBLIC ACCOUNT
-        if (!receiver.isPrivate) {
-
+              if (!receiver.isPrivate) {
+        
             sender.following.push(receiverId);
             receiver.followers.push(senderId);
-
+        
+            
+            sender.hasFollowedFirstUser = true;
+        
             await sender.save();
             await receiver.save();
-
+        
             return res.status(200).json({
                 message: "User followed successfully",
                 status: "following"
@@ -585,13 +588,7 @@ async function sendFollowRequest(req, res) {
 
     }
 }
-// ===============================
-// REJECT FOLLOW REQUEST
-// ===============================
 
-// ===============================
-// REJECT FOLLOW REQUEST
-// ===============================
 
 async function rejectFollowRequest(req, res) {
     try {
@@ -643,9 +640,6 @@ async function rejectFollowRequest(req, res) {
 }
 
 
-// ===============================
-// GET FOLLOWERS
-// ===============================
 
 async function getFollowers(req, res) {
     try {
@@ -678,9 +672,6 @@ async function getFollowers(req, res) {
 }
 
 
-// ===============================
-// EXPORTS
-// ===============================
 
 module.exports = {
     getProfile,
