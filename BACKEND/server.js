@@ -109,22 +109,57 @@ io.on("connection", (socket) => {
         }
     );
 
+socket.on("send_message", (data) => {
 
-    socket.on("send_message", (data) => {
+    const receiverSocket =
+        users[data.receiver];
 
-        const receiverSocket =
-            users[data.receiver];
+    if (receiverSocket) {
 
-        if (receiverSocket) {
+        io.to(receiverSocket).emit(
+            "receive_message",
+            data
+        );
 
-            io.to(receiverSocket).emit(
-                "receive_message",
-                data
-            );
+    }
 
-        }
+});
 
-    });
+
+socket.on("message_delivered", ({ messageId, senderId }) => {
+
+    const senderSocket = users[senderId];
+
+    if (senderSocket) {
+
+        io.to(senderSocket).emit(
+            "message_delivered",
+            {
+                messageId
+            }
+        );
+
+    }
+
+});
+
+
+socket.on("message_seen", ({ messageId, senderId }) => {
+
+    const senderSocket = users[senderId];
+
+    if (senderSocket) {
+
+        io.to(senderSocket).emit(
+            "message_seen",
+            {
+                messageId
+            }
+        );
+
+    }
+
+});
 
 });
 

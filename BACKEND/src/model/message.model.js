@@ -39,7 +39,13 @@ const messageSchema = new mongoose.Schema(
 deletedFor: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "user"
-}]
+}],
+
+status: {
+    type: String,
+    enum: ["sent", "delivered", "seen"],
+    default: "sent"
+}
 
 },
 {

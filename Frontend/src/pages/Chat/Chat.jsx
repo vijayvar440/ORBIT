@@ -49,6 +49,27 @@ function Chat() {
     }
 };
 
+const fetchMessages = async () => {
+    try {
+        const response = await axios.get(
+            `http://localhost:3000/api/message/${userId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            }
+        );
+
+        setMessages(response.data.messages || []);
+
+    } catch (err) {
+        console.log(
+            "FETCH MESSAGES ERROR:",
+            err.response?.data || err.message
+        );
+    }
+};
+
 
    const sendMessage = async () => {
 
@@ -128,9 +149,69 @@ useEffect(() => {
         console.log("Connected");
     });
 
-    socket.on("receive_message", (newMessage) => {
-        setMessages((prev) => [...prev, newMessage]);
+   socket.on("receive_message", async (newMessage) => {
+
+    setMessages((prev) => [...prev, newMessage]);
+
+    
+    socket.emit("message_delivered", {
+        messageId: newMessage._id,
+        senderId: newMessage.sender
     });
+
+    // Message seen
+    try {
+
+        await axios.put(
+            `http://localhost:3000/api/message/seen/${newMessage.sender}`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            }
+        );
+
+        socket.emit("message_seen", {
+            messageId: newMessage._id,
+            senderId: newMessage.sender
+        });
+
+    } catch (err) {
+
+        console.log(
+            "MESSAGE SEEN ERROR:",
+            err.response?.data || err.message
+        );
+
+    }
+
+});
+    
+    socket.on("message_delivered", ({ messageId }) => {
+
+    setMessages((prev) =>
+        prev.map((msg) =>
+            msg._id === messageId
+                ? { ...msg, status: "delivered" }
+                : msg
+        )
+    );
+
+});
+
+
+socket.on("message_seen", ({ messageId }) => {
+
+    setMessages((prev) =>
+        prev.map((msg) =>
+            msg._id === messageId
+                ? { ...msg, status: "seen" }
+                : msg
+        )
+    );
+
+});
 
     socket.on("online-users", (users) => {
 
@@ -151,12 +232,28 @@ socket.on("typing", handleTyping);
 socket.on("stop_typing", handleStopTyping);
 
   
-    fetchUser();
+   fetchUser();
+fetchMessages();
+
+axios.put(
+    `http://localhost:3000/api/message/seen/${userId}`,
+    {},
+    {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+    }
+).catch(err => {
+    console.log("SEEN ERROR:", err.response?.data || err.message);
+});
 
     
 
     return () => {
     socket.off("receive_message");
+    socket.off("message_delivered");
+    socket.off("message_seen");
+
     socket.off("online-users");
     socket.off("typing", handleTyping);
     socket.off("stop_typing", handleStopTyping);
@@ -405,14 +502,23 @@ return (
 
 
                 <span className="message-time">
-                    {new Date(
-                        msg.createdAt
-                    ).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit"
-                    })}
+                {new Date(
+                    msg.createdAt
+                ).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                })}
+            </span>
+            
+            {isMyMessage && (
+                <span className="message-status">
+                    {msg.status === "seen"
+                        ? "✓✓✓"
+                        : msg.status === "delivered"
+                        ? "✓✓"
+                        : "✓"}
                 </span>
-
+            )}
             </div>
 
         </div>

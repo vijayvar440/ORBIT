@@ -29,5 +29,16 @@ router.delete(
     authMiddleware,
     messageController.deleteMessage
 );
+router.put(
+    "/delivered/:userId",
+    authMiddleware,
+    messageController.markMessagesAsDelivered
+);
+
+router.put(
+    "/seen/:userId",
+    authMiddleware,
+    messageController.markMessagesAsSeen
+);
 
 module.exports = router;

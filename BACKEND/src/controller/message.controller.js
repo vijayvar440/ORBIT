@@ -75,6 +75,64 @@ const sendMessage = async (req, res) => {
     }
 
 };
+const markMessagesAsDelivered = async (req, res) => {
+    try {
+        const receiverId = req.user.id;
+        const senderId = req.params.userId;
+
+        await messageModel.updateMany(
+            {
+                sender: senderId,
+                receiver: receiverId,
+                status: "sent"
+            },
+            {
+                $set: { status: "delivered" }
+            }
+        );
+
+        return res.status(200).json({
+            message: "Messages delivered"
+        });
+
+    } catch (err) {
+        console.log(err);
+
+        return res.status(500).json({
+            message: err.message
+        });
+    }
+};
+const markMessagesAsSeen = async (req, res) => {
+    try {
+        const receiverId = req.user.id;
+        const senderId = req.params.userId;
+
+        await messageModel.updateMany(
+            {
+                sender: senderId,
+                receiver: receiverId,
+                status: {
+                    $in: ["sent", "delivered"]
+                }
+            },
+            {
+                $set: { status: "seen" }
+            }
+        );
+
+        return res.status(200).json({
+            message: "Messages seen"
+        });
+
+    } catch (err) {
+        console.log(err);
+
+        return res.status(500).json({
+            message: err.message
+        });
+    }
+};
 const getMessages = async (req, res) => {
 
     try {
@@ -254,5 +312,7 @@ module.exports = {
     sendMessage,
     getMessages,
     getInbox,
-    deleteMessage
+    deleteMessage,
+    markMessagesAsDelivered,
+    markMessagesAsSeen
 };
