@@ -287,9 +287,7 @@ const showWelcomeCard =
                     >
 
 
-                        {/* =========================
-                            POST HEADER
-                        ========================= */}
+                    
 
                         <div className="post-header">
 
