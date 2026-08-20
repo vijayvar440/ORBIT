@@ -6,10 +6,8 @@
     width: 100%;
     max-width: 760px;
 
-    /*
-     * Desktop par navbar ke liye space
-     */
     height: calc(100dvh - 70px);
+    min-height: 0;
 
     margin: 0 auto;
 
@@ -33,14 +31,16 @@
 ========================================================= */
 
 .chat-header {
-    flex: 0 0 auto;
+    flex: 0 0 70px;
+
+    width: 100%;
+    height: 70px;
+    min-height: 70px;
 
     display: flex;
     align-items: center;
 
     gap: 12px;
-
-    min-height: 70px;
 
     padding: 10px 15px;
 
@@ -49,27 +49,32 @@
     border-bottom: 1px solid #ddd;
 
     background: #fff;
+
+    overflow: hidden;
 }
 
 .chat-avatar {
     width: 50px;
     height: 50px;
 
+    flex: 0 0 50px;
+
     border-radius: 50%;
 
     object-fit: cover;
 
     border: 2px solid #eee;
-
-    flex-shrink: 0;
 }
 
 .chat-header h3 {
     margin: 0;
 
     font-size: 17px;
-
     font-weight: 600;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .chat-header p {
@@ -80,26 +85,27 @@
 
 .online {
     color: #10b981;
-
     font-weight: 600;
 }
 
 .offline {
     color: gray;
-
     font-weight: 600;
 }
 
 
 /* =========================================================
    MESSAGE BODY
-   ONLY CHAT BODY SCROLLS
+   ONLY THIS PART WILL SCROLL
 ========================================================= */
 
 .chat-body {
     flex: 1 1 auto;
 
+    width: 100%;
+
     min-height: 0;
+    height: 0;
 
     overflow-y: auto;
     overflow-x: hidden;
@@ -114,6 +120,10 @@
     background: #f4f6fb;
 
     -webkit-overflow-scrolling: touch;
+
+    overscroll-behavior: contain;
+
+    scrollbar-width: thin;
 }
 
 
@@ -122,20 +132,31 @@
 ========================================================= */
 
 .my-message {
-    display: flex;
+    width: 100%;
 
+    display: flex;
     justify-content: flex-end;
 
     margin-bottom: 10px;
+
+    flex-shrink: 0;
 }
 
 .other-message {
-    display: flex;
+    width: 100%;
 
+    display: flex;
     justify-content: flex-start;
 
     margin-bottom: 10px;
+
+    flex-shrink: 0;
 }
+
+
+/* =========================================================
+   MESSAGE BOX
+========================================================= */
 
 .message-box {
     position: relative;
@@ -147,9 +168,7 @@
     border-radius: 16px;
 
     word-wrap: break-word;
-
-    overflow-wrap: break-word;
-
+    overflow-wrap: anywhere;
     word-break: break-word;
 
     font-size: 14px;
@@ -198,12 +217,13 @@
 ========================================================= */
 
 .typing-text {
+    flex-shrink: 0;
+
     color: #0d6efd;
 
     font-size: 13px;
 
     margin-left: 10px;
-
     margin-top: 5px;
 
     font-style: italic;
@@ -218,7 +238,6 @@
     display: block;
 
     width: 240px;
-
     max-width: 100%;
 
     max-height: 300px;
@@ -239,8 +258,9 @@
     display: block;
 
     width: 250px;
-
     max-width: 100%;
+
+    max-height: 350px;
 
     border-radius: 12px;
 
@@ -253,15 +273,17 @@
 ========================================================= */
 
 .chat-footer {
-    flex: 0 0 auto;
+    flex: 0 0 60px;
+
+    width: 100%;
+
+    height: 60px;
+    min-height: 60px;
 
     display: flex;
-
     align-items: center;
 
     gap: 8px;
-
-    min-height: 60px;
 
     padding: 8px 10px;
 
@@ -270,10 +292,14 @@
     border-top: 1px solid #ddd;
 
     background: white;
+
+    position: relative;
+
+    z-index: 10;
 }
 
 .chat-footer input {
-    flex: 1;
+    flex: 1 1 auto;
 
     min-width: 0;
 
@@ -284,7 +310,6 @@
     box-sizing: border-box;
 
     border: none;
-
     outline: none;
 
     background: #f3f3f3;
@@ -298,10 +323,9 @@
 
 .chat-footer button {
     width: 45px;
-
     height: 45px;
 
-    flex-shrink: 0;
+    flex: 0 0 45px;
 
     border: none;
 
@@ -325,7 +349,6 @@
     position: absolute;
 
     right: 4px;
-
     top: 4px;
 
     background: transparent;
@@ -343,7 +366,6 @@
     position: absolute;
 
     right: 5px;
-
     top: 28px;
 
     background: white;
@@ -390,45 +412,31 @@
 
 /* =========================================================
    MOBILE
-   IMPORTANT:
-   DO NOT LOCK html/body/#root SCROLLING
 ========================================================= */
 
 @media (max-width: 768px) {
 
-    /* -----------------------------------------------------
-       CHAT CONTAINER
-    ----------------------------------------------------- */
-
     .chat-container {
         width: 100%;
-
         max-width: none;
 
-        /*
-         * Navbar approx 70px
-         */
         height: calc(100dvh - 70px);
+        min-height: 0;
 
         margin: 0;
 
         border-radius: 0;
 
         display: flex;
-
         flex-direction: column;
 
         overflow: hidden;
 
         box-shadow: none;
-
-        box-sizing: border-box;
     }
 
 
-    /* -----------------------------------------------------
-       HEADER
-    ----------------------------------------------------- */
+    /* HEADER */
 
     .chat-header {
         flex: 0 0 64px;
@@ -436,16 +444,11 @@
         width: 100%;
 
         height: 64px;
-
         min-height: 64px;
 
-        display: flex;
-
-        align-items: center;
+        padding: 8px 12px;
 
         gap: 10px;
-
-        padding: 8px 12px;
 
         box-sizing: border-box;
 
@@ -454,10 +457,9 @@
 
     .chat-avatar {
         width: 45px;
-
         height: 45px;
 
-        flex-shrink: 0;
+        flex: 0 0 45px;
     }
 
     .chat-header h3 {
@@ -475,22 +477,17 @@
     }
 
 
-    /* -----------------------------------------------------
-       MESSAGE BODY
-       ONLY THIS AREA SCROLLS
-    ----------------------------------------------------- */
+    /* MESSAGE BODY */
 
     .chat-body {
-        flex: 1 1 0;
-
-        min-height: 0;
+        flex: 1 1 auto;
 
         width: 100%;
 
-        height: auto;
+        min-height: 0;
+        height: 0;
 
         overflow-y: auto;
-
         overflow-x: hidden;
 
         padding: 10px;
@@ -498,16 +495,18 @@
         box-sizing: border-box;
 
         -webkit-overflow-scrolling: touch;
+
+        overscroll-behavior: contain;
     }
 
 
-    /* -----------------------------------------------------
-       MESSAGE
-    ----------------------------------------------------- */
+    /* MESSAGE */
 
     .my-message,
     .other-message {
         width: 100%;
+
+        flex-shrink: 0;
 
         margin-bottom: 8px;
     }
@@ -521,15 +520,13 @@
 
         box-sizing: border-box;
 
-        overflow-wrap: break-word;
+        overflow-wrap: anywhere;
 
         word-break: break-word;
     }
 
 
-    /* -----------------------------------------------------
-       IMAGE
-    ----------------------------------------------------- */
+    /* IMAGE */
 
     .chat-image {
         width: 210px;
@@ -542,22 +539,20 @@
     }
 
 
-    /* -----------------------------------------------------
-       VIDEO
-    ----------------------------------------------------- */
+    /* VIDEO */
 
     .chat-video {
         width: 220px;
 
         max-width: 100%;
 
+        max-height: 280px;
+
         border-radius: 12px;
     }
 
 
-    /* -----------------------------------------------------
-       TYPING
-    ----------------------------------------------------- */
+    /* TYPING */
 
     .typing-text {
         font-size: 12px;
@@ -568,9 +563,7 @@
     }
 
 
-    /* -----------------------------------------------------
-       FOOTER
-    ----------------------------------------------------- */
+    /* FOOTER */
 
     .chat-footer {
         flex: 0 0 60px;
@@ -578,24 +571,21 @@
         width: 100%;
 
         height: 60px;
-
         min-height: 60px;
 
-        display: flex;
-
-        align-items: center;
+        padding: 7px 8px;
 
         gap: 7px;
-
-        padding: 7px 8px;
 
         box-sizing: border-box;
 
         background: white;
+
+        z-index: 10;
     }
 
     .chat-footer input {
-        flex: 1;
+        flex: 1 1 auto;
 
         min-width: 0;
 
@@ -612,18 +602,15 @@
 
     .chat-footer button {
         width: 44px;
-
         height: 44px;
 
-        flex-shrink: 0;
+        flex: 0 0 44px;
 
         font-size: 18px;
     }
 
 
-    /* -----------------------------------------------------
-       MESSAGE MENU
-    ----------------------------------------------------- */
+    /* MENU */
 
     .message-menu {
         right: 3px;
