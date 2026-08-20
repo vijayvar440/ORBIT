@@ -10,6 +10,15 @@ conectDB();
 
 const server = http.createServer(app);
 
+// Health Check Route
+app.get("/health", (req, res) => {
+    res.status(200).json({
+        status: "OK",
+        message: "Server is awake 🚀",
+        time: new Date().toISOString()
+    });
+});
+
 const io = new Server(server, {
     cors: {
         origin: "http://localhost:5173",

@@ -1,7 +1,31 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { VitePWA } from "vite-plugin-pwa";
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-})
+  plugins: [
+    react(),
+
+    VitePWA({
+      registerType: "autoUpdate",
+
+      manifest: {
+        name: "ORBIT",
+        short_name: "ORBIT",
+        description: "ORBIT Social Media App",
+        theme_color: "#000000",
+        background_color: "#000000",
+        display: "standalone",
+        start_url: "/",
+
+        icons: [
+          {
+            src: "/orbit-logo.png",
+            sizes: "512x512",
+            type: "image/png"
+          }
+        ]
+      }
+    })
+  ]
+});
