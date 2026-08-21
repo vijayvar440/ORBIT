@@ -10,6 +10,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.7.2",
     "multer": "^2.2.0",
+    "multer-storage-cloudinary": "^4.0.0",
     "socket.io": "^4.8.3"
   },
   "name": "sosal_media",
