@@ -10,7 +10,6 @@ async function creatPost(req, res) {
 
         let media = "";
 
-        // ✅ Upload file buffer to Cloudinary
         if (req.file) {
             const cloudinaryResult = await uploadToCloudinary(
                 req.file.buffer,
@@ -24,7 +23,7 @@ async function creatPost(req, res) {
             title,
             description,
             media,
-            mediaType,
+            mediaType: mediaType || "image",
             uploadedBy: userId
         });
 
@@ -287,7 +286,6 @@ async function updatePost(req, res) {
         post.title = title || post.title;
         post.description = description || post.description;
 
-        // ✅ Upload updated file buffer to Cloudinary
         if (req.file) {
             const cloudinaryResult = await uploadToCloudinary(
                 req.file.buffer,
