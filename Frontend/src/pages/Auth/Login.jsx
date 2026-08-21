@@ -1,8 +1,7 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./Login.css";
-import { Link } from "react-router-dom";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -10,91 +9,96 @@ function Login() {
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
-
-    useEffect(()=> {
+    useEffect(() => {
         const token = localStorage.getItem("token");
-        if(token){
-            navigate("/")
+        if (token) {
+            navigate("/");
         }
-    },[])
+    }, [navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(""); // Clear previous error
 
         try {
+            // ✅ Clean Environment Variable with Safe Fallback
+            const BASE_URL = import.meta.env.VITE_API_URL || "https://orbit-backend-94nx.onrender.com";
+
             const response = await axios.post(
-                "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/auth/loginuser",
+                `${BASE_URL}/api/auth/loginuser`,
                 {
                     email,
                     password
                 },
                 {
-                    withCredentials:true
+                    withCredentials: true
                 }
             );
 
-                console.log("Login Response:", response.data);
+            console.log("Login Response:", response.data);
 
-                 localStorage.setItem("token", response.data.token);
-                 localStorage.setItem("userId", response.data.user.id);
+            // Save token and userId safely
+            if (response.data.token) {
+                localStorage.setItem("token", response.data.token);
+            }
+            if (response.data.user?.id || response.data.user?._id) {
+                localStorage.setItem("userId", response.data.user.id || response.data.user._id);
+            }
 
-                console.log("Saved UserId:", localStorage.getItem("userId"));
+            console.log("Saved UserId:", localStorage.getItem("userId"));
 
-                navigate("/");
+            // Redirect to Home
+            navigate("/");
 
+        } catch (error) {
+            console.log("Login Error:", error.response?.data || error.message);
 
-      } catch (error) {
-    console.log(error.response?.data || error.message);
-
-    setError(
-        error.response?.data?.message || "Something went wrong"
-    );
-      }
-    }
+            setError(
+                error.response?.data?.message || "Something went wrong"
+            );
+        }
+    };
 
     return (
-    <div className="login-container">
+        <div className="login-container">
+            <div className="login-card">
+                <h1>Login</h1>
 
-        <div className="login-card">
+                <form onSubmit={handleSubmit}>
+                    <input
+                        type="email"
+                        placeholder="Enter Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
 
-            <h1>Login</h1>
+                    <input
+                        type="password"
+                        placeholder="Enter Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
 
-            <form onSubmit={handleSubmit}>
+                    {error && (
+                        <p className="login-error">
+                            {error}
+                        </p>
+                    )}
 
-                <input
-                    type="email"
-                    placeholder="Enter Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
+                    <button className="login-btn" type="submit">
+                        Login
+                    </button>
+                </form>
 
-                <input
-                    type="password"
-                    placeholder="Enter Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                {error && (
-                 <p className="login-error">
-                     {error}
-                 </p>
-             )}
-
-                <button className="login-btn" type="submit">
-                    Login
-                </button>
-
-            </form>
-
-            <div className="register-link">
-                Don't have an account?{" "}
-                <Link to="/register">Register</Link>
+                <div className="register-link">
+                    Don't have an account?{" "}
+                    <Link to="/register">Register</Link>
+                </div>
             </div>
-
         </div>
-
-    </div>
-);
+    );
 }
 
 export default Login;
