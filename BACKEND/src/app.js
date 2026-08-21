@@ -29,16 +29,13 @@ const corsOptions = {
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 };
 
-// 1. Preflight OPTIONS handling (Sabse pehle)
-app.options("*", cors(corsOptions));
-
-// 2. Global CORS Middleware
+// Global CORS Middleware (Handles regular requests AND Preflight OPTIONS automatically)
 app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());
 
-// 3. API Routes
+// API Routes
 app.use("/api/auth", authRouter);
 app.use("/api/post", postRouter);
 app.use("/api/message", massageRouter);
