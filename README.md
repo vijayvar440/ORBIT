@@ -44,3 +44,32 @@ A Full-Stack Social Media & Real-Time Chat Platform built using the **MERN Stack
 ---
 
 ## 📂 Project Structure
+ORBIT
+│
+├── Frontend
+│   ├── src
+│   │   ├── components  # Navbar, Chat, Inbox, Posts, etc.
+│   │   ├── pages       # Home, Login, Profile, Messages
+│   │   ├── CSS         # Independent CSS Modules
+│   │   └── App.jsx
+│   └── package.json
+│
+└── BACKEND
+├── controller      # Auth, User, Post, Chat Handlers
+├── model           # User, Post, Message Schemas
+├── router          # Express Routes
+├── middlewares     # Auth Verification & File Uploads
+├── config          # DB & Cloudinary Configs
+└── server.js       # Entry Poin
+
+
+👨‍💻 Author
+Vijay Var
+
+Portfolio / Live App: Orbit
+
+GitHub: @vijayvar440
+
+LinkedIn: Vijay Var
+
+Email: vijayvar123456@gmail.com
