@@ -52,7 +52,7 @@ function Navbar() {
         try {
 
             const response = await axios.get(
-                `http://localhost:3000/api/Post/search/${value}`
+                `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/search/${value}`
             );
 
             setUsers(response.data.users);
@@ -74,7 +74,7 @@ function Navbar() {
         try {
 
             const response = await axios.get(
-                "http://localhost:3000/api/notification/unread-count",
+                "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/notification/unread-count",
                 {
                     headers: {
                         Authorization:

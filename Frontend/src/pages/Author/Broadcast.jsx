@@ -22,7 +22,7 @@ function Broadcast() {
             setLoading(true);
 
             const response = await axios.post(
-                "http://localhost:3000/api/notification/broadcast",
+                "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/notification/broadcast",
                 {
                     title,
                     message
@@ -118,4 +118,4 @@ function Broadcast() {
     );
 }
 
-export default Broadcast;
+export default Broadcast;1

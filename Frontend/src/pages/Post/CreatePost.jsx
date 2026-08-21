@@ -23,7 +23,7 @@ function CreatePost() {
 
         try {
             const response = await axios.post(
-                "http://localhost:3000/api/Post/createPost",
+                "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/createPost",
                 formData,
                 {
                     headers: {

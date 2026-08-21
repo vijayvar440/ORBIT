@@ -23,7 +23,7 @@ function Home() {
 const fetchPosts = async () => {
     try {
         const response = await axios.get(
-            "http://localhost:3000/api/post/all-posts",
+            "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/post/all-posts",
             {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -67,7 +67,7 @@ useEffect(() => {
 
             await axios.put(
 
-                `http://localhost:3000/api/post/like/${postId}`,
+                `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/post/like/${postId}`,
 
                 {},
 
@@ -100,7 +100,7 @@ useEffect(() => {
 
             await axios.delete(
 
-                `http://localhost:3000/api/post/delete/${postId}`,
+                `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/post/delete/${postId}`,
 
                 {
                     headers: {
@@ -138,7 +138,7 @@ useEffect(() => {
 
             await axios.post(
 
-                `http://localhost:3000/api/post/comment/${postId}`,
+                `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/post/comment/${postId}`,
 
                 {
                     text
@@ -180,7 +180,7 @@ useEffect(() => {
 
             await axios.put(
 
-                `http://localhost:3000/api/post/follow/${targetUserId}`,
+                `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/post/follow/${targetUserId}`,
 
                 {},
 

@@ -16,7 +16,7 @@ function SinglePost() {
         try {
 
             const response = await axios.get(
-            `http://localhost:3000/api/Post/${id}`
+            `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/${id}`
                 );
                     
             setPost(response.data.post);

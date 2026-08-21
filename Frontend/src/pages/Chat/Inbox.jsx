@@ -13,7 +13,7 @@ function Inbox() {
     const fetchInbox = async () => {
         try {
             const response = await axios.get(
-                "http://localhost:3000/api/message/inbox",
+                "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/message/inbox",
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,

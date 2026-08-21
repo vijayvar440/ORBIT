@@ -29,7 +29,7 @@ function Register() {
         try {
 
             const response = await axios.post(
-                "http://localhost:3000/api/auth/register",
+                "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/auth/register",
                 {
                     username,
                     email,

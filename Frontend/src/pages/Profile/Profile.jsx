@@ -12,7 +12,7 @@ function Profile() {
   const fetchProfile = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/api/Post/profile",
+        "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/profile",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

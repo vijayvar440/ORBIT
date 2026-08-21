@@ -23,7 +23,7 @@ function UserProfile() {
     try {
 
         const response = await axios.get(
-            `http://localhost:3000/api/Post/user/${id}`,
+            `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/user/${id}`,
             {
                 headers: {
                     Authorization:
@@ -104,7 +104,7 @@ function UserProfile() {
         if (followStatus === "following") {
 
             await axios.put(
-                `http://localhost:3000/api/Post/follow/${id}`,
+                `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/follow/${id}`,
                 {},
                 {
                     headers: {
@@ -130,7 +130,7 @@ function UserProfile() {
         if (isPrivate) {
 
             await axios.post(
-                `http://localhost:3000/api/Post/follow-request/${id}`,
+                `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/follow-request/${id}`,
                 {},
                 {
                     headers: {
@@ -147,7 +147,7 @@ function UserProfile() {
 
         // Public account → direct follow
         await axios.put(
-            `http://localhost:3000/api/Post/follow/${id}`,
+            `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/follow/${id}`,
             {},
             {
                 headers: {
