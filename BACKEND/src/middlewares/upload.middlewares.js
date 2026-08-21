@@ -1,19 +1,28 @@
-require("dotenv").config(); // 👈 Essential for loading .env variables
+require("dotenv").config();
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const path = require("path");
 
-// Memory storage setup
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Helper function with dynamic config check
 const uploadToCloudinary = (fileBuffer, mimetype, originalname) => {
-    // Dynamic config call ensures process.env is read at runtime
+    // 🔍 Debugging log (Render ke logs mein dikhega)
+    console.log("Cloud Name Check:", process.env.CLOUDINARY_CLOUD_NAME);
+
+    // Hard fallback check
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim();
+    const apiKey = process.env.CLOUDINARY_API_KEY?.trim();
+    const apiSecret = process.env.CLOUDINARY_API_SECRET?.trim();
+
+    if (!cloudName) {
+        return Promise.reject(new Error("CLOUDINARY_CLOUD_NAME is missing in environment variables!"));
+    }
+
     cloudinary.config({
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-        api_key: process.env.CLOUDINARY_API_KEY,
-        api_secret: process.env.CLOUDINARY_API_SECRET
+        cloud_name: cloudName,
+        api_key: apiKey,
+        api_secret: apiSecret
     });
 
     return new Promise((resolve, reject) => {
