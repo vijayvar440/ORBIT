@@ -1,6 +1,5 @@
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const path = require("path");
 
 cloudinary.config({
@@ -9,31 +8,34 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-
-    params: async (req, file) => {
-
-        let resourceType = "image";
-
-        if (file.mimetype.startsWith("video")) {
-            resourceType = "video";
-        }
-
-        if (file.mimetype.startsWith("audio")) {
-            resourceType = "video";
-        }
-
-        const fileName = path.parse(file.originalname).name;
-
-        return {
-            folder: "social-snap",
-            resource_type: resourceType,
-            public_id: Date.now() + "-" + fileName
-        };
-    }
-});
-
+// Memory storage use karein (Render par crash nahi hoga)
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-module.exports = upload;
+// Direct Cloudinary Upload Helper Function
+const uploadToCloudinary = (fileBuffer, mimetype, originalname) => {
+    return new Promise((resolve, reject) => {
+        let resourceType = "image";
+        if (mimetype.startsWith("video") || mimetype.startsWith("audio")) {
+            resourceType = "video";
+        }
+
+        const fileName = path.parse(originalname).name;
+
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder: "social-snap",
+                resource_type: resourceType,
+                public_id: Date.now() + "-" + fileName
+            },
+            (error, result) => {
+                if (error) return reject(error);
+                resolve(result);
+            }
+        );
+
+        uploadStream.end(fileBuffer);
+    });
+};
+
+module.exports = { upload, uploadToCloudinary, cloudinary };
