@@ -1,19 +1,21 @@
+require("dotenv").config(); // 👈 Essential for loading .env variables
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const path = require("path");
 
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-});
-
-// Memory storage use karein (Render par crash nahi hoga)
+// Memory storage setup
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Direct Cloudinary Upload Helper Function
+// Helper function with dynamic config check
 const uploadToCloudinary = (fileBuffer, mimetype, originalname) => {
+    // Dynamic config call ensures process.env is read at runtime
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
+    });
+
     return new Promise((resolve, reject) => {
         let resourceType = "image";
         if (mimetype.startsWith("video") || mimetype.startsWith("audio")) {
