@@ -18,7 +18,7 @@ function EditProfile() {
         try {
 
             const response = await axios.get(
-                "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/profile",
+                "https://orbit-backend-94nx.onrender.com/api/Post/profile",
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -49,7 +49,7 @@ function EditProfile() {
         try {
 
             const response = await axios.put(
-                "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/update-profile",
+                "https://orbit-backend-94nx.onrender.com/api/Post/update-profile",
                 formData,
                 {
                     headers: {

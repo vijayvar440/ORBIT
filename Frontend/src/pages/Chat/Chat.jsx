@@ -27,7 +27,7 @@ function Chat() {
     try {
 
         const response = await axios.get(
-            `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/user/${userId}`,
+            `https://orbit-backend-94nx.onrender.com/api/Post/user/${userId}`,
             {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -52,7 +52,7 @@ function Chat() {
 const fetchMessages = async () => {
     try {
         const response = await axios.get(
-            `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/message/${userId}`,
+            `https://orbit-backend-94nx.onrender.com/api/message/${userId}`,
             {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -86,7 +86,7 @@ const fetchMessages = async () => {
          }
          
          const response = await axios.post(
-             `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/message/send/${userId}`,
+             `https://orbit-backend-94nx.onrender.com/api/message/send/${userId}`,
              formData,
              {
                  headers: {
@@ -163,7 +163,7 @@ useEffect(() => {
     try {
 
         await axios.put(
-            `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/message/seen/${newMessage.sender}`,
+            `https://orbit-backend-94nx.onrender.com/api/message/seen/${newMessage.sender}`,
             {},
             {
                 headers: {
@@ -236,7 +236,7 @@ socket.on("stop_typing", handleStopTyping);
 fetchMessages();
 
 axios.put(
-    `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/message/seen/${userId}`,
+    `https://orbit-backend-94nx.onrender.com/api/message/seen/${userId}`,
     {},
     {
         headers: {
@@ -282,7 +282,7 @@ const deleteMessage = async (messageId, deleteType) => {
     try {
 
         const response = await axios.delete(
-            `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/message/delete/${messageId}`,
+            `https://orbit-backend-94nx.onrender.com/api/message/delete/${messageId}`,
             {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`

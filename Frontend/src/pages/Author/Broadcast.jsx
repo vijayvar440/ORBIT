@@ -22,7 +22,7 @@ function Broadcast() {
             setLoading(true);
 
             const response = await axios.post(
-                "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/notification/broadcast",
+                "https://orbit-backend-94nx.onrender.com/api/notification/broadcast",
                 {
                     title,
                     message

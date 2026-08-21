@@ -13,7 +13,7 @@ function Notifications() {
         try {
 
             const response = await axios.get(
-                "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/notification",
+                "https://orbit-backend-94nx.onrender.com/api/notification",
                 {
                     headers: {
                         Authorization:
@@ -47,7 +47,7 @@ function Notifications() {
         try {
 
             await axios.put(
-                "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/notification/read-all",
+                "https://orbit-backend-94nx.onrender.com/api/notification/read-all",
                 {},
                 {
                     headers: {
@@ -82,7 +82,7 @@ function Notifications() {
             if (!notification.isRead) {
 
                 await axios.put(
-                    `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/notification/read/${notification._id}`,
+                    `https://orbit-backend-94nx.onrender.com/api/notification/read/${notification._id}`,
                     {},
                     {
                         headers: {

@@ -17,7 +17,7 @@ function Settings() {
         try {
 
             const response = await axios.get(
-                "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/profile",
+                "https://orbit-backend-94nx.onrender.com/api/Post/profile",
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -50,7 +50,7 @@ function Settings() {
             const newPrivacy = !isPrivate;
 
            await axios.put(
-    "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/account/privacy",
+    "https://orbit-backend-94nx.onrender.com/api/Post/account/privacy",
     {
         isPrivate: newPrivacy
     },
@@ -79,7 +79,7 @@ function Settings() {
     try {
 
         await axios.post(
-            "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/auth/logoutUser",
+            "https://orbit-backend-94nx.onrender.com/api/auth/logoutUser",
             {},
             {
                 withCredentials: true

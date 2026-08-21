@@ -11,7 +11,7 @@ function Discover() {
         try {
 
             const response = await axios.get(
-                "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/discover",
+                "https://orbit-backend-94nx.onrender.com/api/Post/discover",
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -50,7 +50,7 @@ function Discover() {
         try {
 
             const response = await axios.put(
-                `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/follow/${userId}`,
+                `https://orbit-backend-94nx.onrender.com/api/Post/follow/${userId}`,
                 {},
                 {
                     headers: {

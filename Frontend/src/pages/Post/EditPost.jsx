@@ -13,7 +13,7 @@ function EditPost(){
      const fetchPost = async () => {
         try{
             const response = await axios.get(
-               "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/all-posts"
+               "https://orbit-backend-94nx.onrender.com/api/Post/all-posts"
             );
 
             const post = response.data.posts.find((p) => p._id === id);
@@ -51,7 +51,7 @@ function EditPost(){
     try {
 
         await axios.put(
-            `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/update/${id}`,
+            `https://orbit-backend-94nx.onrender.com/api/Post/update/${id}`,
             formData,
             {
                 headers: {

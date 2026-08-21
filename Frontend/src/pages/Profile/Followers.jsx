@@ -15,7 +15,7 @@ function Followers() {
         try {
 
             const response = await axios.get(
-                `http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/Post/followers/${id}`
+                `https://orbit-backend-94nx.onrender.com/api/Post/followers/${id}`
             );
 
             setFollowers(response.data.followers);
