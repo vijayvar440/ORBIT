@@ -28,7 +28,7 @@ app.get("/health", (req, res) => {
 
 const server = http.createServer(app);
 
-// Socket.io Config (Matches origins strictly for Credentials/WSS)
+// Socket.io Config
 const io = new Server(server, {
     cors: {
         origin: [
@@ -103,8 +103,9 @@ io.on("connection", (socket) => {
     });
 });
 
-const PORT = process.env.PORT || 3000;
+// Render dynamic port lookup
+const PORT = process.env.PORT || 10000;
 
-server.listen(PORT, "0.0.0.0", () => {
+server.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
 });
