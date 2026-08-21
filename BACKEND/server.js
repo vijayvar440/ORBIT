@@ -19,22 +19,21 @@ app.get("/health", (req, res) => {
     });
 });
 
+// ✅ FIX: Allow all origins (*) or production domain for CORS
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
-        methods: ["GET", "POST"]
+        origin: "*", 
+        methods: ["GET", "POST"],
+        credentials: true
     }
 });
 
-
-const notificationRoutes =
-    require("./src/router/notification.routes");
+const notificationRoutes = require("./src/router/notification.routes");
 
 app.use(
     "/api/notification",
     notificationRoutes
 );
-
 
 const users = {};
 
@@ -42,28 +41,21 @@ io.on("connection", (socket) => {
 
     console.log("🟢 User Connected:", socket.id);
 
-
     socket.on("join", (userId) => {
-
         users[userId] = socket.id;
 
         io.emit(
             "online-users",
             Object.keys(users)
         );
-
     });
 
-
     socket.on("disconnect", () => {
-
         for (let id in users) {
-
             if (users[id] === socket.id) {
                 delete users[id];
                 break;
             }
-
         }
 
         io.emit(
@@ -75,100 +67,63 @@ io.on("connection", (socket) => {
             "🔴 User Disconnected:",
             socket.id
         );
-
     });
-
 
     socket.on(
         "typing",
         ({ sender, receiver }) => {
-
-            const receiverSocket =
-                users[receiver];
-
+            const receiverSocket = users[receiver];
             if (receiverSocket) {
-
                 io.to(receiverSocket).emit(
                     "typing",
                     sender
                 );
-
             }
-
         }
     );
-
 
     socket.on(
         "stop_typing",
         ({ sender, receiver }) => {
-
-            const receiverSocket =
-                users[receiver];
-
+            const receiverSocket = users[receiver];
             if (receiverSocket) {
-
                 io.to(receiverSocket).emit(
                     "stop_typing",
                     sender
                 );
-
             }
-
         }
     );
 
-socket.on("send_message", (data) => {
+    socket.on("send_message", (data) => {
+        const receiverSocket = users[data.receiver];
+        if (receiverSocket) {
+            io.to(receiverSocket).emit(
+                "receive_message",
+                data
+            );
+        }
+    });
 
-    const receiverSocket =
-        users[data.receiver];
+    socket.on("message_delivered", ({ messageId, senderId }) => {
+        const senderSocket = users[senderId];
+        if (senderSocket) {
+            io.to(senderSocket).emit(
+                "message_delivered",
+                { messageId }
+            );
+        }
+    });
 
-    if (receiverSocket) {
-
-        io.to(receiverSocket).emit(
-            "receive_message",
-            data
-        );
-
-    }
-
-});
-
-
-socket.on("message_delivered", ({ messageId, senderId }) => {
-
-    const senderSocket = users[senderId];
-
-    if (senderSocket) {
-
-        io.to(senderSocket).emit(
-            "message_delivered",
-            {
-                messageId
-            }
-        );
-
-    }
-
-});
-
-
-socket.on("message_seen", ({ messageId, senderId }) => {
-
-    const senderSocket = users[senderId];
-
-    if (senderSocket) {
-
-        io.to(senderSocket).emit(
-            "message_seen",
-            {
-                messageId
-            }
-        );
-
-    }
-
-});
+    socket.on("message_seen", ({ messageId, senderId }) => {
+        const senderSocket = users[senderId];
+        if (senderSocket) {
+            io.to(senderSocket).emit(
+                "message_seen",
+                { messageId }
+            );
+        }
+    });
 
 });
 
