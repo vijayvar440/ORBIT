@@ -1,10 +1,9 @@
+import "./EditProfile.css"; // 👈 Sahi Path
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./EditProfile.css"
 
 function EditProfile() {
-
     const navigate = useNavigate();
 
     const [username, setUsername] = useState("");
@@ -17,7 +16,6 @@ function EditProfile() {
 
     const fetchProfile = async () => {
         try {
-
             const response = await axios.get(
                 "https://orbit-backend-94nx.onrender.com/api/Post/profile",
                 {
@@ -39,7 +37,6 @@ function EditProfile() {
         e.preventDefault();
 
         const formData = new FormData();
-
         formData.append("username", username);
         formData.append("bio", bio);
 
@@ -48,7 +45,6 @@ function EditProfile() {
         }
 
         try {
-
             const response = await axios.put(
                 "https://orbit-backend-94nx.onrender.com/api/Post/update-profile",
                 formData,
@@ -59,10 +55,7 @@ function EditProfile() {
                 }
             );
 
-            console.log(response.data);
-
             alert("Profile Updated Successfully ✅");
-
             navigate("/profile");
 
         } catch (err) {
@@ -71,43 +64,52 @@ function EditProfile() {
     };
 
     return (
-        <div>
+        <div className="edit-profile-container">
+            <div className="edit-profile-card">
+                <h2>Edit Profile</h2>
 
-            <h1>Edit Profile</h1>
+                <form onSubmit={handleSubmit} className="edit-profile-form">
+                    
+                    <div className="input-group">
+                        <label>Username</label>
+                        <input
+                            type="text"
+                            placeholder="Enter username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                    </div>
 
-            <form onSubmit={handleSubmit}>
+                    <div className="input-group">
+                        <label>Bio</label>
+                        <textarea
+                            placeholder="Write a short bio..."
+                            value={bio}
+                            rows="3"
+                            onChange={(e) => setBio(e.target.value)}
+                        />
+                    </div>
 
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
+                    <div className="input-group">
+                        <label>Profile Image</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setProfileImage(e.target.files[0])}
+                        />
+                    </div>
 
-                <br /><br />
+                    <div className="button-group">
+                        <button type="button" className="cancel-btn" onClick={() => navigate("/profile")}>
+                            Cancel
+                        </button>
+                        <button type="submit" className="submit-btn">
+                            Update Profile
+                        </button>
+                    </div>
 
-                <textarea
-                    placeholder="Bio"
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                />
-
-                <br /><br />
-
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setProfileImage(e.target.files[0])}
-                />
-
-                <br /><br />
-
-                <button type="submit">
-                    Update Profile
-                </button>
-
-            </form>
-
+                </form>
+            </div>
         </div>
     );
 }

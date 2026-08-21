@@ -16,9 +16,11 @@ const allowedOrigins = [
 
 const corsOptions = {
     origin: function (origin, callback) {
+        // Allow requests with no origin (mobile apps, postman, curl)
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
+            // Fail safely without throwing uncaught backend errors
             callback(null, false);
         }
     },
@@ -27,10 +29,12 @@ const corsOptions = {
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 };
 
-// 1. Global CORS Middleware (Ye Preflight OPTIONS requests auto-handle kar leta hai)
+// 1. Preflight OPTIONS handling (Sabse pehle)
+app.options("*", cors(corsOptions));
+
+// 2. Global CORS Middleware
 app.use(cors(corsOptions));
 
-// 2. Parsers
 app.use(express.json());
 app.use(cookieParser());
 

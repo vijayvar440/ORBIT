@@ -1,0 +1,323 @@
+/* Container centered for all screen sizes */
+.edit-profile-container {
+    width: 100%;
+    min-height: calc(100dvh - 150px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+/* Card layout */
+.edit-profile-card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--card, #ffffff);
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
+}
+
+.edit-profile-card h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--text, #111827);
+}
+
+.edit-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Image preview section */
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.avatar-preview {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary, #2563eb);
+}
+
+.file-upload-btn {
+    font-size: 13px;
+    color: var(--primary, #2563eb);
+    font-weight: 600;
+    cursor: pointer;
+    background: #eef4ff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+
+.file-upload-btn:hover {
+    background: #dbeafe;
+}
+
+.avatar-section input[type="file"] {
+    display: none; /* Hide standard ugly file button */
+}
+
+/* Form Fields */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted, #6b7280);
+}
+
+.input-group input,
+.input-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border, #e5e7eb);
+    background: var(--bg, #f9fafb);
+    color: var(--text, #111827);
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.input-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+    border-color: var(--primary, #2563eb);
+    background: #ffffff;
+}
+
+/* Button Group */
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.cancel-btn,
+.submit-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s;
+}
+
+.cancel-btn {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.submit-btn {
+    background: var(--primary, #2563eb);
+    color: #ffffff;
+}
+
+.cancel-btn:hover,
+.submit-btn:hover {
+    opacity: 0.9;
+}
+
+/* Mobile Responsive Optimization */
+@media (max-width: 480px) {
+    .edit-profile-card {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .edit-profile-card h2 {
+        font-size: 18px;
+    }
+
+    .avatar-preview {
+        width: 80px;
+        height: 80px;
+    }
+
+    .button-group {
+        flex-direction: column-reverse; /* Stack buttons on small screens */
+    }
+}
+
+/* Dark Mode Overrides */
+body.dark .edit-profile-card {
+    background: #151c2d;
+    border-color: #263247;
+}
+
+body.dark .input-group input,
+body.dark .input-group textarea {
+    background: #080d1c;
+    border-color: #263247;
+    color: #ffffff;
+}
+
+body.dark .cancel-btn {
+    background: #263247;
+    color: #94a3b8;
+}
+
+body.dark .file-upload-btn {
+    background: #1e293b;
+    color: #60a5fa;
+}
+/* Container centered for all screen sizes */
+.edit-profile-container {
+    width: 100%;
+    min-height: calc(100vh - 100px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 16px;
+    box-sizing: border-box;
+}
+
+/* Card layout */
+.edit-profile-card {
+    width: 100%;
+    max-width: 480px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
+}
+
+.edit-profile-card h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    color: #111827;
+}
+
+.edit-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Form Fields Setup */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+}
+
+.input-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.input-group input[type="text"],
+.input-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+    color: #111827;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.input-group textarea {
+    resize: vertical;
+    min-height: 90px;
+    font-family: inherit;
+}
+
+.input-group input[type="text"]:focus,
+.input-group textarea:focus {
+    border-color: #2563eb;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* File Input Field */
+.input-group input[type="file"] {
+    padding: 8px 0;
+    font-size: 13px;
+    color: #4b5563;
+}
+
+/* Button Layout */
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.cancel-btn,
+.submit-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s ease;
+}
+
+.cancel-btn {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.submit-btn {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.cancel-btn:hover,
+.submit-btn:hover {
+    opacity: 0.9;
+}
+
+/* Mobile Responsive Fix */
+@media (max-width: 480px) {
+    .edit-profile-container {
+        padding: 16px 10px;
+    }
+
+    .edit-profile-card {
+        padding: 18px;
+    }
+
+    .button-group {
+        flex-direction: column-reverse;
+    }
+}
