@@ -3,11 +3,9 @@ const router = express.Router();
 
 const postController = require("../controller/post.controller");
 const authMiddleware = require("../middlewares/auth.Middlewares");
-const upload = require("../middlewares/upload.middlewares");
+// ✅ FIX: Here { upload } is destructured properly
+const { upload } = require("../middlewares/upload.middlewares");
 const userContoller = require("../controller/user.controller");
-
-
-
 
 router.post(
     "/createPost",
@@ -16,20 +14,17 @@ router.post(
     postController.creatPost
 );
 
-
 router.get(
     "/my-posts",
     authMiddleware,
     postController.getPost
 );
 
-
 router.get(
     "/all-posts",
     authMiddleware,
     postController.getAllPost
 );
-
 
 router.put(
     "/update/:id",
@@ -38,22 +33,17 @@ router.put(
     postController.updatePost
 );
 
-
 router.delete(
     "/delete/:id",
     authMiddleware,
     postController.deletPost
 );
 
-
-
-
 router.get(
     "/profile",
     authMiddleware,
     userContoller.getProfile
 );
-
 
 router.put(
     "/update-profile",
@@ -62,25 +52,22 @@ router.put(
     userContoller.updateProfile
 );
 
-
 router.get(
     "/user/:id",
     authMiddleware,
     userContoller.getUserProfile
 );
 
-
 router.get(
     "/search/:keyword",
     userContoller.searchUser
 );
+
 router.get(
     "/discover",
     authMiddleware,
     userContoller.getDiscoverUsers
 );
-
-
 
 router.put(
     "/follow/:userId",
@@ -88,20 +75,15 @@ router.put(
     userContoller.followUser
 );
 
-
 router.get(
     "/followers/:userId",
     userContoller.getFollowers
 );
 
-
 router.get(
     "/following/:userId",
     userContoller.getFollowing
 );
-
-
-
 
 router.put(
     "/account/privacy",
@@ -109,24 +91,17 @@ router.put(
     userContoller.updatePrivacy
 );
 
-
-
 router.put(
     "/like/:id",
     authMiddleware,
     postController.likePost
 );
 
-
-
-
 router.post(
     "/comment/:id",
     authMiddleware,
     postController.addComment
 );
-
-
 
 router.put(
     "/change-password",
@@ -152,7 +127,6 @@ router.put(
     userContoller.rejectFollowRequest
 );
 
-
 router.get(
     "/:postId",
     authMiddleware,
@@ -160,4 +134,3 @@ router.get(
 );
 
 module.exports = router;
-
