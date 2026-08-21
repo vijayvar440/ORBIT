@@ -424,22 +424,24 @@ const showWelcomeCard =
                   
 
                         {post.mediaType === "image" && (
-
-                            <img
-                                src={post.media}
-                                alt={post.title}
-                                className="post-image"
-
-                                onDoubleClick={(e) => {
-
-                                    e.stopPropagation();
-
-                                    handleLike(post._id);
-
-                                }}
-                            />
-
-                        )}
+    <img
+        src={
+            post.media?.startsWith("http")
+                ? post.media
+                : `https://orbit-backend-94nx.onrender.com${post.media?.startsWith('/') ? '' : '/'}${post.media}`
+        }
+        alt={post.title || "Post media"}
+        className="post-image"
+        onError={(e) => {
+            // Agar image loading fail ho jaye toh hide kar dega
+            e.target.style.display = 'none';
+        }}
+        onDoubleClick={(e) => {
+            e.stopPropagation();
+            handleLike(post._id);
+        }}
+    />
+)}
 
 
                     
