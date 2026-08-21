@@ -1,30 +1,21 @@
 /* =========================================================
-   CHAT CONTAINER
+   GLOBAL / CONTAINER
 ========================================================= */
 
 .chat-container {
     width: 100%;
     max-width: 760px;
-
     height: calc(100dvh - 70px);
     min-height: 0;
-
     margin: 0 auto;
-
     display: flex;
     flex-direction: column;
-
     background: #fff;
-
     border-radius: 16px;
-
     overflow: hidden;
-
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-
     box-sizing: border-box;
 }
-
 
 /* =========================================================
    HEADER
@@ -32,46 +23,33 @@
 
 .chat-header {
     flex: 0 0 70px;
-
     width: 100%;
     height: 70px;
     min-height: 70px;
-
     display: flex;
     align-items: center;
-
     gap: 12px;
-
     padding: 10px 15px;
-
     box-sizing: border-box;
-
     border-bottom: 1px solid #ddd;
-
     background: #fff;
-
-    overflow: hidden;
+    position: relative;
+    z-index: 10;
 }
 
 .chat-avatar {
     width: 50px;
     height: 50px;
-
     flex: 0 0 50px;
-
     border-radius: 50%;
-
     object-fit: cover;
-
     border: 2px solid #eee;
 }
 
 .chat-header h3 {
     margin: 0;
-
     font-size: 17px;
     font-weight: 600;
-
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -79,7 +57,6 @@
 
 .chat-header p {
     margin: 2px 0 0;
-
     font-size: 13px;
 }
 
@@ -93,66 +70,46 @@
     font-weight: 600;
 }
 
-
 /* =========================================================
-   MESSAGE BODY
-   ONLY THIS PART WILL SCROLL
+   MESSAGE BODY (SCROLL AREA)
 ========================================================= */
 
 .chat-body {
     flex: 1 1 auto;
-
     width: 100%;
-
     min-height: 0;
-    height: 0;
-
+    height: 0; /* Critical for Flexbox container scroll */
     overflow-y: auto;
     overflow-x: hidden;
-
     padding: 15px;
-
     box-sizing: border-box;
-
     display: flex;
     flex-direction: column;
-
     background: #f4f6fb;
-
     -webkit-overflow-scrolling: touch;
-
     overscroll-behavior: contain;
-
     scrollbar-width: thin;
 }
-
 
 /* =========================================================
    MESSAGES
 ========================================================= */
 
-.my-message {
+.my-message,
+.other-message {
     width: 100%;
-
     display: flex;
-    justify-content: flex-end;
-
     margin-bottom: 10px;
-
     flex-shrink: 0;
+}
+
+.my-message {
+    justify-content: flex-end;
 }
 
 .other-message {
-    width: 100%;
-
-    display: flex;
     justify-content: flex-start;
-
-    margin-bottom: 10px;
-
-    flex-shrink: 0;
 }
-
 
 /* =========================================================
    MESSAGE BOX
@@ -160,113 +117,72 @@
 
 .message-box {
     position: relative;
-
-    max-width: 70%;
-
+    max-width: 75%;
     padding: 10px 14px;
-
     border-radius: 16px;
-
     word-wrap: break-word;
     overflow-wrap: anywhere;
     word-break: break-word;
-
     font-size: 14px;
-
     box-sizing: border-box;
 }
 
 .my-message .message-box {
     background: #0d6efd;
-
     color: white;
-
-    border-bottom-right-radius: 5px;
+    border-bottom-right-radius: 4px;
 }
 
 .other-message .message-box {
     background: white;
-
     color: black;
-
     border: 1px solid #ddd;
-
-    border-bottom-left-radius: 5px;
+    border-bottom-left-radius: 4px;
 }
 
-
 /* =========================================================
-   MESSAGE TIME
+   MESSAGE TIME & TYPING
 ========================================================= */
 
 .message-time {
     display: block;
-
-    margin-top: 5px;
-
+    margin-top: 4px;
     font-size: 10px;
-
-    opacity: 0.7;
-
+    opacity: 0.75;
     text-align: right;
 }
 
-
-/* =========================================================
-   TYPING
-========================================================= */
-
 .typing-text {
     flex-shrink: 0;
-
     color: #0d6efd;
-
     font-size: 13px;
-
     margin-left: 10px;
     margin-top: 5px;
-
     font-style: italic;
 }
 
-
 /* =========================================================
-   IMAGE
+   MEDIA
 ========================================================= */
 
-.chat-image {
-    display: block;
-
-    width: 240px;
-    max-width: 100%;
-
-    max-height: 300px;
-
-    object-fit: cover;
-
-    border-radius: 12px;
-
-    margin-bottom: 6px;
-}
-
-
-/* =========================================================
-   VIDEO
-========================================================= */
-
+.chat-image,
 .chat-video {
     display: block;
-
-    width: 250px;
     max-width: 100%;
-
-    max-height: 350px;
-
     border-radius: 12px;
-
     margin-bottom: 6px;
 }
 
+.chat-image {
+    width: 240px;
+    max-height: 300px;
+    object-fit: cover;
+}
+
+.chat-video {
+    width: 250px;
+    max-height: 350px;
+}
 
 /* =========================================================
    FOOTER
@@ -274,72 +190,45 @@
 
 .chat-footer {
     flex: 0 0 60px;
-
     width: 100%;
-
     height: 60px;
     min-height: 60px;
-
     display: flex;
     align-items: center;
-
     gap: 8px;
-
     padding: 8px 10px;
-
     box-sizing: border-box;
-
     border-top: 1px solid #ddd;
-
     background: white;
-
     position: relative;
-
     z-index: 10;
 }
 
 .chat-footer input {
     flex: 1 1 auto;
-
     min-width: 0;
-
     width: 100%;
-
     height: 44px;
-
     box-sizing: border-box;
-
     border: none;
     outline: none;
-
     background: #f3f3f3;
-
     padding: 10px 14px;
-
     border-radius: 30px;
-
     font-size: 14px;
 }
 
 .chat-footer button {
     width: 45px;
     height: 45px;
-
     flex: 0 0 45px;
-
     border: none;
-
     border-radius: 50%;
-
     background: #0d6efd;
-
     color: white;
-
     font-size: 19px;
-
     cursor: pointer;
 }
-
 
 /* =========================================================
    FILE / DELETE MENU
@@ -347,53 +236,35 @@
 
 .message-menu-btn {
     position: absolute;
-
     right: 4px;
     top: 4px;
-
     background: transparent;
-
     border: none;
-
     font-size: 18px;
-
     cursor: pointer;
-
     color: #777;
 }
 
 .message-menu {
     position: absolute;
-
-    right: 5px;
-    top: 28px;
-
+    right: 0;
+    top: 100%;
+    margin-top: 4px;
     background: white;
-
     border-radius: 8px;
-
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     overflow: hidden;
-
     z-index: 100;
 }
 
 .message-menu button {
     display: block;
-
-    width: 180px;
-
+    width: 160px;
     padding: 10px 14px;
-
     border: none;
-
     background: white;
-
     text-align: left;
-
     cursor: pointer;
-
     font-size: 13px;
 }
 
@@ -403,232 +274,56 @@
 
 .deleted-message {
     color: #888;
-
     font-style: italic;
-
     margin: 0;
 }
 
-
 /* =========================================================
-   MOBILE
+   MOBILE RESPONSIVE FIXES
 ========================================================= */
 
 @media (max-width: 768px) {
-
     .chat-container {
-        width: 100%;
-        max-width: none;
-
-        height: calc(100dvh - 70px);
+        width: 100vw;
+        max-width: 100%;
+        
+        /* Fixed: Mobile Navbar height (~150px) adjust kar di gayi hai */
+        height: calc(100dvh - 150px); 
         min-height: 0;
 
         margin: 0;
-
         border-radius: 0;
-
         display: flex;
         flex-direction: column;
-
         overflow: hidden;
-
         box-shadow: none;
+        position: relative;
     }
-
-
-    /* HEADER */
 
     .chat-header {
-        flex: 0 0 64px;
-
+        flex: 0 0 55px;
         width: 100%;
-
-        height: 64px;
-        min-height: 64px;
-
+        height: 55px;
+        min-height: 55px;
         padding: 8px 12px;
-
-        gap: 10px;
-
-        box-sizing: border-box;
-
-        overflow: hidden;
     }
-
-    .chat-avatar {
-        width: 45px;
-        height: 45px;
-
-        flex: 0 0 45px;
-    }
-
-    .chat-header h3 {
-        font-size: 16px;
-
-        white-space: nowrap;
-
-        overflow: hidden;
-
-        text-overflow: ellipsis;
-    }
-
-    .chat-header p {
-        font-size: 12px;
-    }
-
-
-    /* MESSAGE BODY */
 
     .chat-body {
         flex: 1 1 auto;
-
         width: 100%;
-
         min-height: 0;
-        height: 0;
-
-        overflow-y: auto;
-        overflow-x: hidden;
-
+        height: 0; /* Keeps messages scrolling inside */
         padding: 10px;
-
-        box-sizing: border-box;
-
-        -webkit-overflow-scrolling: touch;
-
-        overscroll-behavior: contain;
     }
-
-
-    /* MESSAGE */
-
-    .my-message,
-    .other-message {
-        width: 100%;
-
-        flex-shrink: 0;
-
-        margin-bottom: 8px;
-    }
-
-    .message-box {
-        max-width: 80%;
-
-        font-size: 13px;
-
-        padding: 9px 12px;
-
-        box-sizing: border-box;
-
-        overflow-wrap: anywhere;
-
-        word-break: break-word;
-    }
-
-
-    /* IMAGE */
-
-    .chat-image {
-        width: 210px;
-
-        max-width: 100%;
-
-        max-height: 260px;
-
-        border-radius: 12px;
-    }
-
-
-    /* VIDEO */
-
-    .chat-video {
-        width: 220px;
-
-        max-width: 100%;
-
-        max-height: 280px;
-
-        border-radius: 12px;
-    }
-
-
-    /* TYPING */
-
-    .typing-text {
-        font-size: 12px;
-
-        margin-left: 8px;
-
-        margin-top: 4px;
-    }
-
-
-    /* FOOTER */
 
     .chat-footer {
-        flex: 0 0 60px;
-
+        flex: 0 0 55px;
         width: 100%;
-
-        height: 60px;
-        min-height: 60px;
-
-        padding: 7px 8px;
-
-        gap: 7px;
-
-        box-sizing: border-box;
-
-        background: white;
-
-        z-index: 10;
-    }
-
-    .chat-footer input {
-        flex: 1 1 auto;
-
-        min-width: 0;
-
-        width: 100%;
-
-        height: 44px;
-
-        padding: 10px 13px;
-
-        font-size: 13px;
-
-        box-sizing: border-box;
-    }
-
-    .chat-footer button {
-        width: 44px;
-        height: 44px;
-
-        flex: 0 0 44px;
-
-        font-size: 18px;
-    }
-
-
-    /* MENU */
-
-    .message-menu {
-        right: 3px;
-
-        top: 27px;
-
-        max-width: calc(100vw - 30px);
-    }
-
-    .message-menu button {
-        width: 170px;
-
-        padding: 9px 12px;
-
-        font-size: 13px;
+        height: 55px;
+        min-height: 55px;
+        padding: 6px 10px;
     }
 }
-
 
 /* =========================================================
    DARK MODE
@@ -640,9 +335,7 @@ body.dark .chat-container {
 
 body.dark .chat-header {
     background: #111827;
-
     border-bottom-color: #374151;
-
     color: white;
 }
 
@@ -650,7 +343,9 @@ body.dark .chat-header h3 {
     color: white;
 }
 
-body.dark .chat-header p {
+body.dark .chat-header p,
+body.dark .offline,
+body.dark .deleted-message {
     color: #9ca3af;
 }
 
@@ -660,21 +355,17 @@ body.dark .chat-body {
 
 body.dark .other-message .message-box {
     background: #374151;
-
     color: white;
-
     border-color: #4b5563;
 }
 
 body.dark .chat-footer {
     background: #111827;
-
     border-top-color: #374151;
 }
 
 body.dark .chat-footer input {
     background: #374151;
-
     color: white;
 }
 
@@ -684,10 +375,6 @@ body.dark .chat-footer input::placeholder {
 
 body.dark .chat-avatar {
     border-color: #4b5563;
-}
-
-body.dark .offline {
-    color: #9ca3af;
 }
 
 body.dark .typing-text {
@@ -700,14 +387,9 @@ body.dark .message-menu {
 
 body.dark .message-menu button {
     background: #1f2937;
-
     color: white;
 }
 
 body.dark .message-menu button:hover {
     background: #374151;
-}
-
-body.dark .deleted-message {
-    color: #9ca3af;
 }

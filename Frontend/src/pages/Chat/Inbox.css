@@ -1,44 +1,152 @@
-.inbox-container{
-    max-width:600px;
-    margin:30px auto;
-    background:#fff;
-    border-radius:12px;
-    padding:20px;
-    box-shadow:0 2px 10px rgba(0,0,0,.1);
+/* =========================================================
+   INBOX CONTAINER & CARD STYLES
+========================================================= */
+
+.inbox-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 30px auto;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 
-.chat-card{
-    display:flex;
-    align-items:center;
-    gap:15px;
-    padding:12px;
-    border-bottom:1px solid #eee;
-    cursor:pointer;
-    transition:.2s;
+.chat-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    border-bottom: 1px solid #eeeeee;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-radius: 8px;
 }
 
-.chat-card:hover{
-    background:#f5f5f5;
+.chat-card:hover {
+    background: #f5f5f5;
 }
 
-.chat-card img{
-    width:55px;
-    height:55px;
-    border-radius:50%;
-    object-fit:cover;
+.chat-card img {
+    width: 55px;
+    height: 55px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
-.chat-info h3{
-    margin:0;
-    font-size:17px;
+.chat-info {
+    flex: 1;
+    min-width: 0; /* Ensures text truncation works inside flexbox */
 }
 
-.chat-info p{
-    margin-top:5px;
-    color:#666;
+.chat-info h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
+.chat-info p {
+    margin: 5px 0 0 0;
+    color: #666666;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
+/* =========================================================
+   MESSAGE MENU & POPUP BUTTONS
+========================================================= */
+
+.message-box {
+    position: relative;
+}
+
+.message-menu-btn {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #777777;
+    line-height: 1;
+    padding: 2px 6px;
+}
+
+.message-menu {
+    position: absolute;
+    right: 5px;
+    top: 30px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    z-index: 100;
+}
+
+.message-menu button {
+    display: block;
+    width: 180px;
+    padding: 10px 14px;
+    border: none;
+    background: #ffffff;
+    text-align: left;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333333;
+}
+
+.message-menu button:hover {
+    background: #f1f1f1;
+}
+
+.deleted-message {
+    color: #888888;
+    font-style: italic;
+    margin: 0;
+}
+
+/* =========================================================
+   MOBILE RESPONSIVE (Fixes edge-to-edge layout)
+========================================================= */
+
+@media (max-width: 768px) {
+    .inbox-container {
+        margin: 10px auto;
+        padding: 12px;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .chat-card {
+        padding: 10px 8px;
+        gap: 12px;
+    }
+
+    .chat-card img {
+        width: 48px;
+        height: 48px;
+    }
+
+    .chat-info h3 {
+        font-size: 15px;
+    }
+
+    .chat-info p {
+        font-size: 13px;
+    }
+}
+
+/* =========================================================
+   DARK MODE SUPPORT
+========================================================= */
 
 body.dark .inbox-container {
     background: #1f2937;
@@ -59,4 +167,18 @@ body.dark .chat-info h3 {
 
 body.dark .chat-info p {
     color: #9ca3af;
+}
+
+body.dark .message-menu {
+    background: #111827;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+}
+
+body.dark .message-menu button {
+    background: #111827;
+    color: #ffffff;
+}
+
+body.dark .message-menu button:hover {
+    background: #374151;
 }
