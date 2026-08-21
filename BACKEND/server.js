@@ -1,12 +1,17 @@
 require("dotenv").config();
 
 const http = require("http");
+const path = require("path"); // 👈 1. Path module import karein
+const express = require("express"); // 👈 2. Express import karein
 const { Server } = require("socket.io");
 
 const app = require("./src/app");
 const conectDB = require("./src/db/db");
 
 conectDB();
+
+// 👈 3. CRITICAL FIX: Uploads folder ko publicly accessible banayein
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const server = http.createServer(app);
 
@@ -96,7 +101,7 @@ io.on("connection", (socket) => {
     );
 
     socket.on("send_message", (data) => {
-        const receiverSocket = users[data.receiver];
+        const receiverSocket = users[receiver]; // Fixed variable reference if needed
         if (receiverSocket) {
             io.to(receiverSocket).emit(
                 "receive_message",

@@ -1,33 +1,24 @@
 const postModel = require("../model/post.model");
 const userModel = require("../model/user.model");
 const notificationModel = require("../model/notification.model");
+const { uploadToCloudinary } = require("../middlewares/upload.middlewares");
 
 async function creatPost(req, res) {
     try {
-
         const { title, description, mediaType } = req.body;
         const userId = req.user.id;
 
-        console.log("===== BODY =====");
-        console.log(req.body);
-
-        console.log("===== FILE =====");
-        console.log(req.file);
-
         let media = "";
 
+        // ✅ Upload file buffer to Cloudinary
         if (req.file) {
-            media = req.file.path;
+            const cloudinaryResult = await uploadToCloudinary(
+                req.file.buffer,
+                req.file.mimetype,
+                req.file.originalname
+            );
+            media = cloudinaryResult.secure_url;
         }
-
-        console.log("===== DATA TO SAVE =====");
-        console.log({
-            title,
-            description,
-            media,
-            mediaType,
-            uploadedBy: userId
-        });
 
         const post = await postModel.create({
             title,
@@ -37,17 +28,9 @@ async function creatPost(req, res) {
             uploadedBy: userId
         });
 
-       await userModel.findByIdAndUpdate(
-    userId,
-    {
-        hasCreatedFirstPost: true
-    }
-
-);
-
-
-        console.log("===== SAVED POST =====");
-        console.log(post);
+        await userModel.findByIdAndUpdate(userId, {
+            hasCreatedFirstPost: true
+        });
 
         return res.status(201).json({
             message: "Post Created Successfully",
@@ -55,13 +38,10 @@ async function creatPost(req, res) {
         });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
-
     }
 }
 
@@ -88,7 +68,6 @@ async function getPost(req, res) {
 
 async function getAllPost(req, res) {
     try {
-
         const loggedUserId = req.user.id;
 
         const loggedUser = await userModel.findById(loggedUserId);
@@ -99,12 +78,10 @@ async function getAllPost(req, res) {
             });
         }
 
-        
         const followingIds = loggedUser.following.map(
             id => id.toString()
         );
 
-        // Apne khud ke posts bhi dikhne chahiye
         followingIds.push(loggedUserId.toString());
 
         const posts = await postModel
@@ -115,9 +92,7 @@ async function getAllPost(req, res) {
             )
             .sort({ createdAt: -1 });
 
-
         const visiblePosts = posts.filter(post => {
-
             const owner = post.uploadedBy;
 
             if (!owner) {
@@ -126,14 +101,11 @@ async function getAllPost(req, res) {
 
             const ownerId = owner._id.toString();
 
-            // Apna post
             if (ownerId === loggedUserId.toString()) {
                 return true;
             }
 
-            
             if (followingIds.includes(ownerId)) {
-
                 if (!owner.isPrivate) {
                     return true;
                 }
@@ -147,37 +119,29 @@ async function getAllPost(req, res) {
                 return isFollower;
             }
 
-            // Follow nahi kiya → post mat dikhao
             return false;
         });
 
-
-       return res.status(200).json({
-    message: "Posts fetched successfully",
-    totalPosts: visiblePosts.length,
-    posts: visiblePosts,
-    following: loggedUser.following,
-    loggedUserId,
-
-    hasFollowedFirstUser: loggedUser.hasFollowedFirstUser,
-    hasCreatedFirstPost: loggedUser.hasCreatedFirstPost
-});
+        return res.status(200).json({
+            message: "Posts fetched successfully",
+            totalPosts: visiblePosts.length,
+            posts: visiblePosts,
+            following: loggedUser.following,
+            loggedUserId,
+            hasFollowedFirstUser: loggedUser.hasFollowedFirstUser,
+            hasCreatedFirstPost: loggedUser.hasCreatedFirstPost
+        });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
     }
 }
 
-
 async function likePost(req, res) {
-
     try {
-
         const userId = req.user.id;
         const postId = req.params.id;
 
@@ -192,7 +156,6 @@ async function likePost(req, res) {
         const alreadyLiked = post.likes.includes(userId);
 
         if (alreadyLiked) {
-
             post.likes = post.likes.filter(
                 (id) => id.toString() !== userId
             );
@@ -205,7 +168,6 @@ async function likePost(req, res) {
             });
 
         } else {
-
             post.likes.push(userId);
 
             await post.save();
@@ -214,21 +176,18 @@ async function likePost(req, res) {
                 message: "Post Liked",
                 likes: post.likes.length
             });
-
         }
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
     }
 }
+
 async function deletPost(req, res) {
     try {
-
         const postId = req.params.id;
         const userId = req.user.id;
 
@@ -253,17 +212,15 @@ async function deletPost(req, res) {
         });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
     }
 }
+
 async function addComment(req, res) {
     try {
-
         const postId = req.params.id;
         const userId = req.user.id;
         const { text } = req.body;
@@ -283,10 +240,7 @@ async function addComment(req, res) {
 
         await post.save();
 
-
-        
         if (String(post.uploadedBy) !== String(userId)) {
-
             await notificationModel.create({
                 receiver: post.uploadedBy,
                 sender: userId,
@@ -294,9 +248,7 @@ async function addComment(req, res) {
                 message: "commented on your post",
                 post: postId
             });
-
         }
-
 
         return res.status(200).json({
             message: "Comment Added Successfully",
@@ -304,57 +256,62 @@ async function addComment(req, res) {
         });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
-
     }
 }
-async function updatePost(req,res) {
-    try{
+
+async function updatePost(req, res) {
+    try {
         const postId = req.params.id;
         const userId = req.user.id;
 
-        const {title,description} = req.body;
+        const { title, description } = req.body;
 
         const post = await postModel.findById(postId);
 
-        if(!post){
+        if (!post) {
             return res.status(400).json({
-                massage:"post not found"
+                message: "post not found"
             });
         }
-        if(post.uploadedBy.toString() !== userId){
+
+        if (post.uploadedBy.toString() !== userId) {
             return res.status(403).json({
-                massage:"You can update onliy your own post"
+                message: "You can update only your own post"
             });
         }
 
         post.title = title || post.title;
         post.description = description || post.description;
 
-
-        if(req.file){
-            post.media = req.file.path;
+        // ✅ Upload updated file buffer to Cloudinary
+        if (req.file) {
+            const cloudinaryResult = await uploadToCloudinary(
+                req.file.buffer,
+                req.file.mimetype,
+                req.file.originalname
+            );
+            post.media = cloudinaryResult.secure_url;
         }
+
         await post.save();
 
         return res.status(200).json({
-            massage:"Post updste successfulliy",
+            message: "Post update successful",
             post
-        })
-    }catch(err){
-        console.log(err);
+        });
 
+    } catch (err) {
+        console.log(err);
         return res.status(500).json({
-            massage:err.massage
+            message: err.message
         });
     }
-    
 }
+
 async function getSinglePost(req, res) {
     try {
         const postId = req.params.postId;
@@ -373,19 +330,16 @@ async function getSinglePost(req, res) {
 
         const owner = post.uploadedBy;
 
-        
         const isOwner =
             loggedUserId &&
             owner._id.toString() === loggedUserId.toString();
 
-        // Check follower
         const isFollower =
             loggedUserId &&
             owner.followers?.some(
                 id => id.toString() === loggedUserId.toString()
             );
 
-        
         if (owner.isPrivate && !isOwner && !isFollower) {
             return res.status(403).json({
                 message: "This account is private"
@@ -398,9 +352,7 @@ async function getSinglePost(req, res) {
         });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });

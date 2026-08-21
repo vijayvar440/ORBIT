@@ -1,8 +1,9 @@
 const userModel = require("../model/user.model");
 const postModel = require("../model/post.model");
 const notificationModel = require("../model/notification.model");
-
 const followRequestModel = require("../model/followRequest.model");
+const bcrypt = require("bcrypt"); // ensure bcrypt is imported for changePassword
+const { uploadToCloudinary } = require("../middlewares/upload.middlewares");
 
 async function getProfile(req, res) {
     try {
@@ -29,32 +30,30 @@ async function getProfile(req, res) {
     }
 }
 
-
-
 async function updateProfile(req, res) {
     try {
-
-        const { username, bio } = req.body;
+        const { username, bio, isPrivate } = req.body;
         const userId = req.user.id;
 
-        // Update object
-        const updateData = {
-            username,
-            bio
-        };
+        const updateData = {};
+        if (username) updateData.username = username;
+        if (bio !== undefined) updateData.bio = bio;
+        if (isPrivate !== undefined) updateData.isPrivate = isPrivate;
 
-        // Agar image upload hui hai
+        // ✅ Cloudinary Direct Buffer Upload
         if (req.file) {
-            updateData.profileImage = req.file.path;
+            const cloudinaryResult = await uploadToCloudinary(
+                req.file.buffer,
+                req.file.mimetype,
+                req.file.originalname
+            );
+            updateData.profileImage = cloudinaryResult.secure_url;
         }
 
-        // User update
         const updatedUser = await userModel.findByIdAndUpdate(
             userId,
             updateData,
-            {
-                new: true
-            }
+            { new: true }
         ).select("-password");
 
         return res.status(200).json({
@@ -64,15 +63,14 @@ async function updateProfile(req, res) {
 
     } catch (err) {
         console.error(err);
-
         return res.status(500).json({
-            message: "Internal Server Error"
+            message: err.message || "Internal Server Error"
         });
     }
 }
+
 async function searchUser(req, res) {
     try {
-
         const keyword = req.params.keyword;
 
         const users = await userModel
@@ -90,18 +88,15 @@ async function searchUser(req, res) {
         });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
-
     }
 }
+
 async function getUserProfile(req, res) {
     try {
-
         const userId = req.params.id;
         const loggedUserId = req.user?.id;
 
@@ -115,22 +110,17 @@ async function getUserProfile(req, res) {
             });
         }
 
-        
         const isOwner =
             loggedUserId &&
             loggedUserId.toString() === userId.toString();
 
-        
         const isFollower =
             loggedUserId &&
             user.followers.some(
                 id => id.toString() === loggedUserId.toString()
             );
 
-        
-
         if (user.isPrivate && !isOwner && !isFollower) {
-
             return res.status(200).json({
                 user,
                 posts: [],
@@ -139,8 +129,6 @@ async function getUserProfile(req, res) {
                 message: "This account is private"
             });
         }
-
-       
 
         const posts = await postModel.find({
             uploadedBy: userId
@@ -154,19 +142,15 @@ async function getUserProfile(req, res) {
         });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
-
     }
 }
 
 async function followUser(req, res) {
     try {
-
         const loggedUserId = req.user.id;
         const targetUserId = req.params.userId;
 
@@ -189,18 +173,14 @@ async function followUser(req, res) {
             id => id.toString() === targetUserId
         );
 
-      
         if (alreadyFollowing) {
+            loggedUser.following = loggedUser.following.filter(
+                id => id.toString() !== targetUserId
+            );
 
-            loggedUser.following =
-                loggedUser.following.filter(
-                    id => id.toString() !== targetUserId
-                );
-
-            targetUser.followers =
-                targetUser.followers.filter(
-                    id => id.toString() !== loggedUserId
-                );
+            targetUser.followers = targetUser.followers.filter(
+                id => id.toString() !== loggedUserId
+            );
 
             await loggedUser.save();
             await targetUser.save();
@@ -210,18 +190,13 @@ async function followUser(req, res) {
             });
         }
 
-     
-
         loggedUser.following.push(targetUserId);
         targetUser.followers.push(loggedUserId);
-
-     
         loggedUser.hasFollowedFirstUser = true;
 
         await loggedUser.save();
         await targetUser.save();
 
-      
         await notificationModel.create({
             receiver: targetUserId,
             sender: loggedUserId,
@@ -234,19 +209,15 @@ async function followUser(req, res) {
         });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
     }
 }
 
-
 async function getFollowing(req, res) {
     try {
-
         const user = await userModel.findById(req.params.userId)
             .populate("following", "username profileImage");
 
@@ -262,16 +233,15 @@ async function getFollowing(req, res) {
 
     } catch (err) {
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
     }
 }
+
 async function getDiscoverUsers(req, res) {
     try {
         const loggedUserId = req.user.id;
-
         const loggedUser = await userModel.findById(loggedUserId);
 
         if (!loggedUser) {
@@ -282,9 +252,7 @@ async function getDiscoverUsers(req, res) {
 
         const users = await userModel
             .find({
-                _id: {
-                    $ne: loggedUserId
-                }
+                _id: { $ne: loggedUserId }
             })
             .select("username profileImage bio followers following isPrivate");
 
@@ -294,19 +262,15 @@ async function getDiscoverUsers(req, res) {
         });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
     }
 }
 
-
 async function updatePrivacy(req, res) {
     try {
-
         const userId = req.user.id;
         const { isPrivate } = req.body;
 
@@ -338,19 +302,16 @@ async function updatePrivacy(req, res) {
         });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
     }
 }
+
 async function changePassword(req, res) {
     try {
-
         const userId = req.user.id;
-
         const { oldPassword, newPassword } = req.body;
 
         const user = await userModel.findById(userId);
@@ -378,7 +339,6 @@ async function changePassword(req, res) {
         );
 
         user.password = hashedPassword;
-
         await user.save();
 
         return res.status(200).json({
@@ -386,25 +346,19 @@ async function changePassword(req, res) {
         });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
-
     }
 }
 
 async function acceptFollowRequest(req, res) {
-
     try {
-
         const receiverId = req.user.id;
         const requestId = req.params.requestId;
 
-        const request =
-            await followRequestModel.findById(requestId);
+        const request = await followRequestModel.findById(requestId);
 
         if (!request) {
             return res.status(404).json({
@@ -412,16 +366,11 @@ async function acceptFollowRequest(req, res) {
             });
         }
 
-
-        if (
-            request.receiver.toString() !==
-            receiverId.toString()
-        ) {
+        if (request.receiver.toString() !== receiverId.toString()) {
             return res.status(403).json({
                 message: "You cannot accept this request"
             });
         }
-
 
         if (request.status !== "pending") {
             return res.status(400).json({
@@ -429,15 +378,8 @@ async function acceptFollowRequest(req, res) {
             });
         }
 
-
-        const sender = await userModel.findById(
-            request.sender
-        );
-
-        const receiver = await userModel.findById(
-            request.receiver
-        );
-
+        const sender = await userModel.findById(request.sender);
+        const receiver = await userModel.findById(request.receiver);
 
         if (!sender || !receiver) {
             return res.status(404).json({
@@ -445,39 +387,20 @@ async function acceptFollowRequest(req, res) {
             });
         }
 
-
-        // Add follower/following
-        if (
-            !receiver.followers.some(
-                id =>
-                    id.toString() ===
-                    sender._id.toString()
-            )
-        ) {
+        if (!receiver.followers.some(id => id.toString() === sender._id.toString())) {
             receiver.followers.push(sender._id);
         }
 
-
-
-       if (
-            !sender.following.some(
-                id =>
-                    id.toString() ===
-                    receiver._id.toString()
-            )
-        ) {
+        if (!sender.following.some(id => id.toString() === receiver._id.toString())) {
             sender.following.push(receiver._id);
         }
-        
-        // First follow permanently remember
+
         sender.hasFollowedFirstUser = true;
-        
         request.status = "accepted";
-        
+
         await sender.save();
         await receiver.save();
         await request.save();
-
 
         return res.status(200).json({
             message: "Follow request accepted",
@@ -485,21 +408,15 @@ async function acceptFollowRequest(req, res) {
         });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
-
     }
 }
 
-
 async function sendFollowRequest(req, res) {
-
     try {
-
         const senderId = req.user.id;
         const receiverId = req.params.userId;
 
@@ -518,8 +435,6 @@ async function sendFollowRequest(req, res) {
             });
         }
 
-
-        // Already following?
         const alreadyFollowing = sender.following.some(
             id => id.toString() === receiverId.toString()
         );
@@ -530,14 +445,11 @@ async function sendFollowRequest(req, res) {
             });
         }
 
-
-        // Check existing request
-        const existingRequest =
-            await followRequestModel.findOne({
-                sender: senderId,
-                receiver: receiverId,
-                status: "pending"
-            });
+        const existingRequest = await followRequestModel.findOne({
+            sender: senderId,
+            receiver: receiverId,
+            status: "pending"
+        });
 
         if (existingRequest) {
             return res.status(400).json({
@@ -545,32 +457,24 @@ async function sendFollowRequest(req, res) {
             });
         }
 
-
-        // PUBLIC ACCOUNT
-              if (!receiver.isPrivate) {
-        
+        if (!receiver.isPrivate) {
             sender.following.push(receiverId);
             receiver.followers.push(senderId);
-        
-            
             sender.hasFollowedFirstUser = true;
-        
+
             await sender.save();
             await receiver.save();
-        
+
             return res.status(200).json({
                 message: "User followed successfully",
                 status: "following"
             });
         }
 
-
-        // PRIVATE ACCOUNT
         const request = await followRequestModel.create({
             sender: senderId,
             receiver: receiverId
         });
-
 
         return res.status(201).json({
             message: "Follow request sent",
@@ -579,25 +483,19 @@ async function sendFollowRequest(req, res) {
         });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
-
     }
 }
 
-
 async function rejectFollowRequest(req, res) {
     try {
-
         const receiverId = req.user.id;
         const requestId = req.params.requestId;
 
-        const request =
-            await followRequestModel.findById(requestId);
+        const request = await followRequestModel.findById(requestId);
 
         if (!request) {
             return res.status(404).json({
@@ -605,10 +503,7 @@ async function rejectFollowRequest(req, res) {
             });
         }
 
-        if (
-            request.receiver.toString() !==
-            receiverId.toString()
-        ) {
+        if (request.receiver.toString() !== receiverId.toString()) {
             return res.status(403).json({
                 message: "You cannot reject this request"
             });
@@ -621,7 +516,6 @@ async function rejectFollowRequest(req, res) {
         }
 
         request.status = "rejected";
-
         await request.save();
 
         return res.status(200).json({
@@ -630,26 +524,18 @@ async function rejectFollowRequest(req, res) {
         });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
     }
 }
 
-
-
 async function getFollowers(req, res) {
     try {
-
         const user = await userModel
             .findById(req.params.userId)
-            .populate(
-                "followers",
-                "username profileImage"
-            );
+            .populate("followers", "username profileImage");
 
         if (!user) {
             return res.status(404).json({
@@ -662,31 +548,24 @@ async function getFollowers(req, res) {
         });
 
     } catch (err) {
-
         console.log(err);
-
         return res.status(500).json({
             message: err.message
         });
     }
 }
 
-
-
 module.exports = {
     getProfile,
     updateProfile,
     searchUser,
     getUserProfile,
-
     followUser,
     getFollowers,
     getFollowing,
     getDiscoverUsers,
-
     updatePrivacy,
     changePassword,
-
     sendFollowRequest,
     acceptFollowRequest,
     rejectFollowRequest
