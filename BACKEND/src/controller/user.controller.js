@@ -2,7 +2,7 @@ const userModel = require("../model/user.model");
 const postModel = require("../model/post.model");
 const notificationModel = require("../model/notification.model");
 const followRequestModel = require("../model/followRequest.model");
-const bcrypt = require("bcrypt"); // ensure bcrypt is imported for changePassword
+const bcrypt = require("bcryptjs");// ensure bcrypt is imported for changePassword
 const { uploadToCloudinary } = require("../middlewares/upload.middlewares");
 
 async function getProfile(req, res) {
