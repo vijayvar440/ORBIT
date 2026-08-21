@@ -4,7 +4,6 @@ import { useNavigate, Link } from "react-router-dom";
 import "./Register.css";
 
 function Register() {
-
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -12,24 +11,22 @@ function Register() {
     const navigate = useNavigate();
 
     useEffect(() => {
-
         const token = localStorage.getItem("token");
 
         if (token) {
             navigate("/");
         }
-
     }, [navigate]);
 
-
     const handleSubmit = async (e) => {
-
         e.preventDefault();
 
         try {
+            // ✅ Clean & Corrected URL
+            const BASE_URL = import.meta.env.VITE_API_URL || "https://orbit-backend-94nx.onrender.com";
 
             const response = await axios.post(
-                "http://[https://orbit-backend-94nx.onrender.com](https://orbit-backend-94nx.onrender.com)/api/auth/register",
+                `${BASE_URL}/api/auth/register`,
                 {
                     username,
                     email,
@@ -41,28 +38,20 @@ function Register() {
             );
 
             console.log("Register Response:", response.data);
-
             alert("Account created successfully!");
-
             navigate("/login");
 
         } catch (error) {
-
             console.log(
                 error.response?.data || error.message
             );
-
+            alert(error.response?.data?.message || "Registration failed!");
         }
-
     };
 
-
     return (
-
         <div className="register-container">
-
             <div className="register-card">
-
                 <div className="register-logo">
                     Orbit
                 </div>
@@ -74,14 +63,11 @@ function Register() {
                 </p>
 
                 <form onSubmit={handleSubmit}>
-
                     <input
                         type="text"
                         placeholder="Username"
                         value={username}
-                        onChange={(e) =>
-                            setUsername(e.target.value)
-                        }
+                        onChange={(e) => setUsername(e.target.value)}
                         required
                     />
 
@@ -89,9 +75,7 @@ function Register() {
                         type="email"
                         placeholder="Email"
                         value={email}
-                        onChange={(e) =>
-                            setEmail(e.target.value)
-                        }
+                        onChange={(e) => setEmail(e.target.value)}
                         required
                     />
 
@@ -99,9 +83,7 @@ function Register() {
                         type="password"
                         placeholder="Password"
                         value={password}
-                        onChange={(e) =>
-                            setPassword(e.target.value)
-                        }
+                        onChange={(e) => setPassword(e.target.value)}
                         required
                     />
 
@@ -111,23 +93,16 @@ function Register() {
                     >
                         Create Account
                     </button>
-
                 </form>
 
                 <div className="login-link">
-
                     Already have an account?{" "}
-
                     <Link to="/login">
                         Login
                     </Link>
-
                 </div>
-
             </div>
-
         </div>
-
     );
 }
 
