@@ -31,12 +31,11 @@ const notificationSchema = new mongoose.Schema(
             required: true
         },
 
-        post: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "post",
-            default: null
-        },
-
+       post: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Post",
+                    default: null
+                },
         isRead: {
             type: Boolean,
             default: false
