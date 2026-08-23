@@ -40,36 +40,32 @@ async function createNotification(req, res) {
 }
 
 
+
 // BROADCAST NOTIFICATION
 async function broadcastNotification(req, res) {
-
     try {
 
         // Only author can broadcast
         if (req.user.role !== "author") {
-
             return res.status(403).json({
                 message: "Only author can send broadcast notifications"
             });
-
         }
 
         const { title, message } = req.body;
 
+        // Validate title
         if (!title || !title.trim()) {
-
             return res.status(400).json({
                 message: "Title is required"
             });
-
         }
 
+        // Validate message
         if (!message || !message.trim()) {
-
             return res.status(400).json({
                 message: "Message is required"
             });
-
         }
 
         const sender = req.user.id;
@@ -83,51 +79,39 @@ async function broadcastNotification(req, res) {
         );
 
         if (users.length === 0) {
-
             return res.status(400).json({
                 message: "No users found"
             });
-
         }
 
+        // Create notification for every user
         const notifications = users.map((user) => ({
-
             receiver: user._id,
-
             sender: sender,
-
             type: "broadcast",
-
             message: `${title.trim()}: ${message.trim()}`,
-
             post: null,
-
             isRead: false
-
         }));
 
-        await notificationModel.insertMany(
-            notifications
-        );
+        await notificationModel.insertMany(notifications);
 
         return res.status(201).json({
-
             message: "Broadcast notification sent successfully",
-
             totalUsers: users.length
-
         });
 
     } catch (err) {
 
-        console.log(err);
+        console.log("Broadcast Error:", err);
 
         return res.status(500).json({
             message: err.message
         });
-
     }
 }
+
+
 
 
 // GET NOTIFICATIONS
