@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home/Home";
@@ -29,6 +30,13 @@ import Broadcast from "./pages/Author/Broadcast";
 
 
 function App() {
+     useEffect(() => {
+        if ("Notification" in window) {
+            Notification.requestPermission().then((permission) => {
+                console.log("Notification permission:", permission);
+            });
+        }
+    }, []);
     return (
         <>
             <Navbar />
