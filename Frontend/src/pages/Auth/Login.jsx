@@ -18,10 +18,10 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(""); // Clear previous error
+        setError("");
 
         try {
-            // ✅ Clean Environment Variable with Safe Fallback
+            
             const BASE_URL = import.meta.env.VITE_API_URL || "https://orbit-backend-94nx.onrender.com";
 
             const response = await axios.post(
@@ -62,7 +62,11 @@ function Login() {
     return (
         <div className="login-container">
             <div className="login-card">
-                <h1>Login</h1>
+                <h1>Welcome Back</h1>
+
+                  <p className="login-subtitle">
+                      Login to continue to ORBIT
+                  </p>
 
                 <form onSubmit={handleSubmit}>
                     <input

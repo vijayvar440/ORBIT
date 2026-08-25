@@ -38,7 +38,7 @@ function Register() {
             );
 
             console.log("Register Response:", response.data);
-            alert("Account created successfully!");
+            alert("Account created successfully! Please login to continue.");
             navigate("/login");
 
         } catch (error) {
