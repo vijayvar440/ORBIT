@@ -20,7 +20,7 @@ export default defineConfig({
 
         icons: [
           {
-            src: "/orbit-logo.png",
+            src: "/icon/icon-192.png",
             sizes: "512x512",
             type: "image/png"
           }
