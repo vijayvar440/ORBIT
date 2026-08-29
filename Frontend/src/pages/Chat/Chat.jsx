@@ -473,552 +473,420 @@ function Chat() {
 
     useEffect(() => {
 
-        if (!currentUserId) return;
+    if (!currentUserId) return;
 
-        socket.emit(
-            "join",
-            currentUserId
-        );
+    // ==============================
+    // SOCKET JOIN
+    // ==============================
 
-        // Important for calling
-        socket.emit(
-            "call:join",
-            currentUserId
-        );
+    // Chat ke liye
+    socket.emit("join", currentUserId);
 
-        fetchUser();
-        fetchMessages();
+    // Calling ke liye
+    socket.emit("call:join", currentUserId);
 
-        // Mark messages as seen
-        axios.put(
-            `https://orbit-backend-94nx.onrender.com/api/message/seen/${userId}`,
-            {},
-            {
-                headers: {
-                    Authorization:
-                        `Bearer ${localStorage.getItem("token")}`
-                }
+
+    // ==============================
+    // INITIAL DATA
+    // ==============================
+
+    fetchUser();
+    fetchMessages();
+
+
+    // ==============================
+    // MARK OLD MESSAGES AS SEEN
+    // ==============================
+
+    axios.put(
+        `https://orbit-backend-94nx.onrender.com/api/message/seen/${userId}`,
+        {},
+        {
+            headers: {
+                Authorization:
+                    `Bearer ${localStorage.getItem("token")}`
             }
-        ).catch(
-            (err) =>
+        }
+    ).catch((err) => {
+        console.log(
+            "SEEN ERROR:",
+            err.response?.data || err.message
+        );
+    });
+
+
+    // ==============================
+    // RECEIVE MESSAGE
+    // ==============================
+
+    const handleReceiveMessage = async (newMessage) => {
+
+        if (
+            String(newMessage.sender) ===
+            String(userId)
+        ) {
+
+            setMessages((prev) => [
+                ...prev,
+                newMessage
+            ]);
+
+
+            // Message delivered
+            socket.emit("message_delivered", {
+                messageId: newMessage._id,
+                senderId: newMessage.sender
+            });
+
+
+            // Mark message as seen
+            try {
+
+                await axios.put(
+                    `https://orbit-backend-94nx.onrender.com/api/message/seen/${newMessage.sender}`,
+                    {},
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${localStorage.getItem("token")}`
+                        }
+                    }
+                );
+
+
+                socket.emit("message_seen", {
+                    messageId: newMessage._id,
+                    senderId: newMessage.sender
+                });
+
+            } catch (err) {
+
                 console.log(
-                    "SEEN ERROR:",
+                    "MESSAGE SEEN ERROR:",
                     err.response?.data ||
                     err.message
-                )
+                );
+
+            }
+
+        }
+    };
+
+
+    // ==============================
+    // MESSAGE DELIVERED
+    // ==============================
+
+    const handleMessageDelivered = ({
+        messageId
+    }) => {
+
+        setMessages((prev) =>
+            prev.map((msg) =>
+                msg._id === messageId
+                    ? {
+                        ...msg,
+                        status: "delivered"
+                    }
+                    : msg
+            )
         );
 
-        // =====================================
-        // MESSAGE RECEIVE
-        // =====================================
+    };
 
-        const handleReceiveMessage =
-            async (newMessage) => {
 
-                if (
-                    String(newMessage.sender) ===
-                    String(userId)
-                ) {
+    // ==============================
+    // MESSAGE SEEN
+    // ==============================
 
-                    setMessages(
-                        (prev) => [
-                            ...prev,
-                            newMessage
-                        ]
-                    );
+    const handleMessageSeen = ({
+        messageId
+    }) => {
 
-                    socket.emit(
-                        "message_delivered",
-                        {
-                            messageId:
-                                newMessage._id,
-
-                            senderId:
-                                newMessage.sender
-                        }
-                    );
-
-                    try {
-
-                        await axios.put(
-                            `https://orbit-backend-94nx.onrender.com/api/message/seen/${newMessage.sender}`,
-                            {},
-                            {
-                                headers: {
-                                    Authorization:
-                                        `Bearer ${localStorage.getItem("token")}`
-                                }
-                            }
-                        );
-
-                        socket.emit(
-                            "message_seen",
-                            {
-                                messageId:
-                                    newMessage._id,
-
-                                senderId:
-                                    newMessage.sender
-                            }
-                        );
-
-                    } catch (err) {
-
-                        console.log(
-                            "MESSAGE SEEN ERROR:",
-                            err.response?.data ||
-                            err.message
-                        );
-
+        setMessages((prev) =>
+            prev.map((msg) =>
+                msg._id === messageId
+                    ? {
+                        ...msg,
+                        status: "seen"
                     }
-                }
-            };
-
-        // =====================================
-        // MESSAGE DELIVERED
-        // =====================================
-
-        const handleMessageDelivered =
-            ({ messageId }) => {
-
-                setMessages(
-                    (prev) =>
-                        prev.map(
-                            (msg) =>
-                                msg._id === messageId
-                                    ? {
-                                        ...msg,
-                                        status:
-                                            "delivered"
-                                    }
-                                    : msg
-                        )
-                );
-            };
-
-        // =====================================
-        // MESSAGE SEEN
-        // =====================================
-
-        const handleMessageSeen =
-            ({ messageId }) => {
-
-                setMessages(
-                    (prev) =>
-                        prev.map(
-                            (msg) =>
-                                msg._id === messageId
-                                    ? {
-                                        ...msg,
-                                        status:
-                                            "seen"
-                                    }
-                                    : msg
-                        )
-                );
-            };
-
-        // =====================================
-        // ONLINE USERS
-        // =====================================
-
-        const handleOnlineUsers =
-            (users) => {
-
-                setOnline(
-                    users.includes(userId)
-                );
-            };
-
-        // =====================================
-        // TYPING
-        // =====================================
-
-        const handleTyping =
-            (senderId) => {
-
-                if (
-                    String(senderId) ===
-                    String(userId)
-                ) {
-
-                    setIsTyping(true);
-                }
-            };
-
-        const handleStopTyping =
-            (senderId) => {
-
-                if (
-                    String(senderId) ===
-                    String(userId)
-                ) {
-
-                    setIsTyping(false);
-                }
-            };
-
-        // =====================================
-        // INCOMING CALL
-        // =====================================
-
-        const handleIncomingCall =
-            ({
-                callerId,
-                receiverId,
-                callType
-            }) => {
-
-                console.log(
-                    "📞 Incoming Call:",
-                    {
-                        callerId,
-                        receiverId,
-                        callType
-                    }
-                );
-
-                setCallerId(
-                    callerId
-                );
-
-                setCallType(
-                    callType
-                );
-
-                setCallIncoming(
-                    true
-                );
-            };
-
-        // =====================================
-        // CALL ACCEPTED
-        // =====================================
-
-        const handleCallAccepted =
-            async ({
-                callerId,
-                receiverId
-            }) => {
-
-                console.log(
-                    "✅ Call Accepted"
-                );
-
-                setCallActive(
-                    true
-                );
-
-                await startWebRTCOffer(
-                    receiverId
-                );
-            };
-
-        // =====================================
-        // CALL REJECTED
-        // =====================================
-
-        const handleCallRejected =
-            () => {
-
-                console.log(
-                    "❌ Call Rejected"
-                );
-
-                alert(
-                    "Call rejected"
-                );
-
-                endCall(false);
-            };
-
-        // =====================================
-        // CALL ENDED
-        // =====================================
-
-        const handleCallEnded =
-            () => {
-
-                console.log(
-                    "📴 Call Ended"
-                );
-
-                endCall(false);
-            };
-
-        // =====================================
-        // WEBRTC OFFER
-        // =====================================
-
-        const handleCallOffer =
-            async ({
-                offer,
-                senderId
-            }) => {
-
-                try {
-
-                    console.log(
-                        "📨 WebRTC Offer Received"
-                    );
-
-                    await createPeerConnection(
-                        senderId
-                    );
-
-                    await peerConnection.current
-                        .setRemoteDescription(
-                            new RTCSessionDescription(
-                                offer
-                            )
-                        );
-
-                    const answer =
-                        await peerConnection.current
-                            .createAnswer();
-
-                    await peerConnection.current
-                        .setLocalDescription(
-                            answer
-                        );
-
-                    socket.emit(
-                        "call:answer",
-                        {
-                            receiverId:
-                                senderId,
-
-                            answer
-                        }
-                    );
-
-                    setCallIncoming(
-                        false
-                    );
-
-                    setCallActive(
-                        true
-                    );
-
-                } catch (error) {
-
-                    console.log(
-                        "OFFER ERROR:",
-                        error
-                    );
-                }
-            };
-
-        // =====================================
-        // WEBRTC ANSWER
-        // =====================================
-
-        const handleCallAnswer =
-            async ({ answer }) => {
-
-                try {
-
-                    if (
-                        !peerConnection.current
-                    ) {
-                        return;
-                    }
-
-                    await peerConnection.current
-                        .setRemoteDescription(
-                            new RTCSessionDescription(
-                                answer
-                            )
-                        );
-
-                    console.log(
-                        "📨 WebRTC Answer Received"
-                    );
-
-                } catch (error) {
-
-                    console.log(
-                        "ANSWER ERROR:",
-                        error
-                    );
-                }
-            };
-
-        // =====================================
-        // ICE CANDIDATE
-        // =====================================
-
-        const handleIceCandidate =
-            async ({
-                candidate
-            }) => {
-
-                try {
-
-                    if (
-                        !peerConnection.current
-                    ) {
-                        return;
-                    }
-
-                    await peerConnection.current
-                        .addIceCandidate(
-                            new RTCIceCandidate(
-                                candidate
-                            )
-                        );
-
-                } catch (error) {
-
-                    console.log(
-                        "ICE ERROR:",
-                        error
-                    );
-                }
-            };
-
-        // =====================================
-        // SOCKET LISTENERS
-        // =====================================
-
-        socket.on(
+                    : msg
+            )
+        );
+
+    };
+
+
+    // ==============================
+    // ONLINE USERS
+    // ==============================
+
+    const handleOnlineUsers = (users) => {
+
+        setOnline(
+            users.includes(userId)
+        );
+
+    };
+
+
+    // ==============================
+    // TYPING
+    // ==============================
+
+    const handleTyping = (senderId) => {
+
+        if (
+            String(senderId) ===
+            String(userId)
+        ) {
+
+            setIsTyping(true);
+
+        }
+
+    };
+
+
+    // ==============================
+    // STOP TYPING
+    // ==============================
+
+    const handleStopTyping = (senderId) => {
+
+        if (
+            String(senderId) ===
+            String(userId)
+        ) {
+
+            setIsTyping(false);
+
+        }
+
+    };
+
+
+    // ==================================================
+    // 📞 INCOMING CALL
+    // ==================================================
+
+    const handleIncomingCall = (data) => {
+
+        console.log(
+            "📞 INCOMING CALL:",
+            data
+        );
+
+        setCallerId(data.callerId);
+
+        setCallType(data.callType);
+
+        setCallIncoming(true);
+
+    };
+
+
+    // ==================================================
+    // 📞 CALL ACCEPTED
+    // ==================================================
+
+    const handleCallAccepted = (data) => {
+
+        console.log(
+            "✅ CALL ACCEPTED:",
+            data
+        );
+
+        setCallIncoming(false);
+
+        setCallActive(true);
+
+    };
+
+
+    // ==================================================
+    // 📞 CALL REJECTED
+    // ==================================================
+
+    const handleCallRejected = (data) => {
+
+        console.log(
+            "❌ CALL REJECTED:",
+            data
+        );
+
+        setCallIncoming(false);
+
+        setCallActive(false);
+
+        alert("Call rejected");
+
+    };
+
+
+    // ==================================================
+    // 📞 CALL ENDED
+    // ==================================================
+
+    const handleCallEnded = () => {
+
+        console.log(
+            "📴 CALL ENDED"
+        );
+
+        setCallIncoming(false);
+
+        setCallActive(false);
+
+
+        // Stop microphone / camera
+        if (localStream.current) {
+
+            localStream.current
+                .getTracks()
+                .forEach((track) => {
+                    track.stop();
+                });
+
+            localStream.current = null;
+
+        }
+
+
+        // Close WebRTC connection
+        if (peerConnection.current) {
+
+            peerConnection.current.close();
+
+            peerConnection.current = null;
+
+        }
+
+    };
+
+
+    // ==============================
+    // SOCKET LISTENERS
+    // ==============================
+
+    socket.on(
+        "receive_message",
+        handleReceiveMessage
+    );
+
+    socket.on(
+        "message_delivered",
+        handleMessageDelivered
+    );
+
+    socket.on(
+        "message_seen",
+        handleMessageSeen
+    );
+
+    socket.on(
+        "online-users",
+        handleOnlineUsers
+    );
+
+    socket.on(
+        "typing",
+        handleTyping
+    );
+
+    socket.on(
+        "stop_typing",
+        handleStopTyping
+    );
+
+
+    // ==============================
+    // 📞 CALL LISTENERS
+    // ==============================
+
+    socket.on(
+        "call:incoming",
+        handleIncomingCall
+    );
+
+    socket.on(
+        "call:accepted",
+        handleCallAccepted
+    );
+
+    socket.on(
+        "call:rejected",
+        handleCallRejected
+    );
+
+    socket.on(
+        "call:ended",
+        handleCallEnded
+    );
+
+
+    // ==============================
+    // CLEANUP
+    // ==============================
+
+    return () => {
+
+        socket.off(
             "receive_message",
             handleReceiveMessage
         );
 
-        socket.on(
+        socket.off(
             "message_delivered",
             handleMessageDelivered
         );
 
-        socket.on(
+        socket.off(
             "message_seen",
             handleMessageSeen
         );
 
-        socket.on(
+        socket.off(
             "online-users",
             handleOnlineUsers
         );
 
-        socket.on(
+        socket.off(
             "typing",
             handleTyping
         );
 
-        socket.on(
+        socket.off(
             "stop_typing",
             handleStopTyping
         );
 
-        socket.on(
+
+        // 📞 Call cleanup
+
+        socket.off(
             "call:incoming",
             handleIncomingCall
         );
 
-        socket.on(
+        socket.off(
             "call:accepted",
             handleCallAccepted
         );
 
-        socket.on(
+        socket.off(
             "call:rejected",
             handleCallRejected
         );
 
-        socket.on(
+        socket.off(
             "call:ended",
             handleCallEnded
         );
 
-        socket.on(
-            "call:offer",
-            handleCallOffer
-        );
+    };
 
-        socket.on(
-            "call:answer",
-            handleCallAnswer
-        );
-
-        socket.on(
-            "call:ice-candidate",
-            handleIceCandidate
-        );
-
-        // =====================================
-        // CLEANUP
-        // =====================================
-
-        return () => {
-
-            socket.off(
-                "receive_message",
-                handleReceiveMessage
-            );
-
-            socket.off(
-                "message_delivered",
-                handleMessageDelivered
-            );
-
-            socket.off(
-                "message_seen",
-                handleMessageSeen
-            );
-
-            socket.off(
-                "online-users",
-                handleOnlineUsers
-            );
-
-            socket.off(
-                "typing",
-                handleTyping
-            );
-
-            socket.off(
-                "stop_typing",
-                handleStopTyping
-            );
-
-            socket.off(
-                "call:incoming",
-                handleIncomingCall
-            );
-
-            socket.off(
-                "call:accepted",
-                handleCallAccepted
-            );
-
-            socket.off(
-                "call:rejected",
-                handleCallRejected
-            );
-
-            socket.off(
-                "call:ended",
-                handleCallEnded
-            );
-
-            socket.off(
-                "call:offer",
-                handleCallOffer
-            );
-
-            socket.off(
-                "call:answer",
-                handleCallAnswer
-            );
-
-            socket.off(
-                "call:ice-candidate",
-                handleIceCandidate
-            );
-        };
-
-    }, [userId]);
+}, [userId]);
 
     // =========================================
     // AUTO SCROLL
@@ -1277,23 +1145,38 @@ function Chat() {
 
                 <div className="call-buttons">
 
-                    <button
-                        className="call-btn"
-                        onClick={() =>
-                            startCall("audio")
-                        }
-                    >
-                        📞
-                    </button>
-
-                    <button
-                        className="call-btn"
-                        onClick={() =>
-                            startCall("video")
-                        }
-                    >
-                        🎥
-                    </button>
+                   <button
+                         className="call-btn"
+                         onClick={() => {
+                     
+                             console.log("📞 Starting audio call");
+                     
+                             socket.emit("call:start", {
+                                 callerId: currentUserId,
+                                 receiverId: userId,
+                                 callType: "audio"
+                             });
+                     
+                         }}
+                     >
+                         📞
+                     </button>
+                       <button
+                           className="call-btn"
+                           onClick={() => {
+                       
+                               console.log("🎥 Starting video call");
+                       
+                               socket.emit("call:start", {
+                                   callerId: currentUserId,
+                                   receiverId: userId,
+                                   callType: "video"
+                               });
+                       
+                           }}
+                       >
+                           🎥
+                       </button>
 
                 </div>
 
