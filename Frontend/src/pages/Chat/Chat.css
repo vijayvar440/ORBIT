@@ -393,3 +393,42 @@ body.dark .message-menu button {
 body.dark .message-menu button:hover {
     background: #374151;
 }
+
+.chat-header {
+    display: flex;
+    align-items: center;
+}
+
+.chat-user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.call-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.call-btn {
+    width: 40px;
+    height: 40px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f1f1f1;
+
+    cursor: pointer;
+
+    font-size: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.call-btn:hover {
+    background: #e5e5e5;
+}

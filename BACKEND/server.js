@@ -5,6 +5,8 @@ const path = require("path");
 const express = require("express");
 const { Server } = require("socket.io");
 
+const callSocket = require("./src/socket/call.socket");
+
 // App router with configured CORS imported here
 const app = require("./src/app");
 const conectDB = require("./src/db/db");
@@ -12,100 +14,257 @@ const conectDB = require("./src/db/db");
 conectDB();
 
 // Static uploads directory
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use(
+    "/uploads",
+    express.static(path.join(__dirname, "uploads"))
+);
 
-const notificationRoutes = require("./src/router/notification.routes");
-app.use("/api/notification", notificationRoutes);
+// Notification routes
+const notificationRoutes =
+    require("./src/router/notification.routes");
+
+app.use(
+    "/api/notification",
+    notificationRoutes
+);
 
 // Health Check Route
 app.get("/health", (req, res) => {
+
     res.status(200).json({
         status: "OK",
         message: "Server is awake 🚀",
         time: new Date().toISOString()
     });
+
 });
+
+
+// ================= SERVER =================
 
 const server = http.createServer(app);
 
-// Socket.io Config
+
+// ================= SOCKET.IO =================
+
 const io = new Server(server, {
+
     cors: {
+
         origin: [
             "https://orbit-one-inky.vercel.app",
             "http://localhost:5173",
             "http://localhost:3000"
         ],
-        methods: ["GET", "POST", "PUT", "DELETE"],
+
+        methods: [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE"
+        ],
+
         credentials: true
     },
-    transports: ["websocket", "polling"]
+
+    transports: [
+        "websocket",
+        "polling"
+    ]
+
 });
+
+
+// ================= CHAT USERS =================
 
 const users = {};
 
+
+// ================= EXISTING CHAT SOCKET =================
+
 io.on("connection", (socket) => {
-    console.log("🟢 User Connected:", socket.id);
 
+    console.log(
+        "🟢 User Connected:",
+        socket.id
+    );
+
+
+    // JOIN USER
     socket.on("join", (userId) => {
+
         if (userId) {
+
             users[userId] = socket.id;
-            io.emit("online-users", Object.keys(users));
+
+            io.emit(
+                "online-users",
+                Object.keys(users)
+            );
+
         }
+
     });
 
+
+    // DISCONNECT
     socket.on("disconnect", () => {
+
         for (let id in users) {
+
             if (users[id] === socket.id) {
+
                 delete users[id];
+
                 break;
+
             }
+
         }
-        io.emit("online-users", Object.keys(users));
-        console.log("🔴 User Disconnected:", socket.id);
+
+        io.emit(
+            "online-users",
+            Object.keys(users)
+        );
+
+        console.log(
+            "🔴 User Disconnected:",
+            socket.id
+        );
+
     });
 
-    socket.on("typing", ({ sender, receiver }) => {
-        const receiverSocket = users[receiver];
-        if (receiverSocket) {
-            io.to(receiverSocket).emit("typing", sender);
-        }
-    });
 
-    socket.on("stop_typing", ({ sender, receiver }) => {
-        const receiverSocket = users[receiver];
-        if (receiverSocket) {
-            io.to(receiverSocket).emit("stop_typing", sender);
-        }
-    });
+    // TYPING
+    socket.on(
+        "typing",
+        ({ sender, receiver }) => {
 
-    socket.on("send_message", (data) => {
-        const receiverId = data.receiver || data.receiverId;
-        const receiverSocket = users[receiverId];
+            const receiverSocket =
+                users[receiver];
 
-        if (receiverSocket) {
-            io.to(receiverSocket).emit("receive_message", data);
-        }
-    });
+            if (receiverSocket) {
 
-    socket.on("message_delivered", ({ messageId, senderId }) => {
-        const senderSocket = users[senderId];
-        if (senderSocket) {
-            io.to(senderSocket).emit("message_delivered", { messageId });
-        }
-    });
+                io.to(receiverSocket).emit(
+                    "typing",
+                    sender
+                );
 
-    socket.on("message_seen", ({ messageId, senderId }) => {
-        const senderSocket = users[senderId];
-        if (senderSocket) {
-            io.to(senderSocket).emit("message_seen", { messageId });
+            }
+
         }
-    });
+    );
+
+
+    // STOP TYPING
+    socket.on(
+        "stop_typing",
+        ({ sender, receiver }) => {
+
+            const receiverSocket =
+                users[receiver];
+
+            if (receiverSocket) {
+
+                io.to(receiverSocket).emit(
+                    "stop_typing",
+                    sender
+                );
+
+            }
+
+        }
+    );
+
+
+    // SEND MESSAGE
+    socket.on(
+        "send_message",
+        (data) => {
+
+            const receiverId =
+                data.receiver ||
+                data.receiverId;
+
+            const receiverSocket =
+                users[receiverId];
+
+            if (receiverSocket) {
+
+                io.to(receiverSocket).emit(
+                    "receive_message",
+                    data
+                );
+
+            }
+
+        }
+    );
+
+
+    // MESSAGE DELIVERED
+    socket.on(
+        "message_delivered",
+        ({ messageId, senderId }) => {
+
+            const senderSocket =
+                users[senderId];
+
+            if (senderSocket) {
+
+                io.to(senderSocket).emit(
+                    "message_delivered",
+                    {
+                        messageId
+                    }
+                );
+
+            }
+
+        }
+    );
+
+
+    // MESSAGE SEEN
+    socket.on(
+        "message_seen",
+        ({ messageId, senderId }) => {
+
+            const senderSocket =
+                users[senderId];
+
+            if (senderSocket) {
+
+                io.to(senderSocket).emit(
+                    "message_seen",
+                    {
+                        messageId
+                    }
+                );
+
+            }
+
+        }
+    );
+
 });
 
-// Render dynamic port lookup
-const PORT = process.env.PORT || 10000;
+
+
+
+//  Video / Audio calling
+callSocket(io);
+
+
+
+
+const PORT =
+    process.env.PORT || 10000;
 
 server.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
+
+    console.log(
+        `🚀 Server is running on port ${PORT}`
+    );
+
 });
