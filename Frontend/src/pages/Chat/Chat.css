@@ -432,3 +432,374 @@ body.dark .message-menu button:hover {
 .call-btn:hover {
     background: #e5e5e5;
 }
+
+
+/* =========================================================
+   CALL BUTTONS
+========================================================= */
+
+.chat-header {
+    display: flex;
+    align-items: center;
+}
+
+.chat-user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.call-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.call-btn {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f1f1f1;
+    color: #111;
+
+    cursor: pointer;
+
+    font-size: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.2s ease;
+}
+
+.call-btn:hover {
+    background: #e5e5e5;
+    transform: scale(1.05);
+}
+
+.call-btn:active {
+    transform: scale(0.95);
+}
+
+.call-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* =========================================================
+   INCOMING CALL POPUP
+========================================================= */
+
+.incoming-call {
+    position: fixed;
+    z-index: 99999;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: min(380px, calc(100% - 30px));
+
+    padding: 25px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    text-align: center;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+
+    box-sizing: border-box;
+}
+
+.incoming-call-icon {
+    font-size: 55px;
+    margin-bottom: 10px;
+}
+
+.incoming-call h3 {
+    margin: 5px 0;
+}
+
+.incoming-call p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.call-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.accept-call-btn,
+.reject-call-btn {
+    border: none;
+
+    color: white;
+
+    padding: 12px 20px;
+
+    border-radius: 25px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    min-width: 100px;
+}
+
+.accept-call-btn {
+    background: #16a34a;
+}
+
+.accept-call-btn:hover {
+    background: #15803d;
+}
+
+.reject-call-btn {
+    background: #dc2626;
+}
+
+.reject-call-btn:hover {
+    background: #b91c1c;
+}
+
+
+/* =========================================================
+   CALL SCREEN
+========================================================= */
+
+.call-screen {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 99998;
+
+    background: #050505;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+.remote-video {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    background: #050505;
+}
+
+.local-video {
+    position: absolute;
+
+    right: 15px;
+    top: 70px;
+
+    width: 120px;
+    height: 170px;
+
+    object-fit: cover;
+
+    border-radius: 14px;
+
+    border: 2px solid white;
+
+    background: #111;
+
+    z-index: 3;
+}
+
+.call-status {
+    position: absolute;
+
+    top: 20px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    color: white;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    padding: 8px 15px;
+
+    border-radius: 20px;
+
+    z-index: 5;
+
+    font-size: 14px;
+
+    white-space: nowrap;
+}
+
+.end-call-btn {
+    position: absolute;
+
+    bottom: 30px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 65px;
+    height: 65px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #ef4444;
+
+    color: white;
+
+    font-size: 25px;
+
+    z-index: 5;
+
+    cursor: pointer;
+}
+
+.end-call-btn:hover {
+    background: #dc2626;
+    transform: translateX(-50%) scale(1.05);
+}
+
+.audio-call-avatar {
+    color: white;
+
+    text-align: center;
+}
+
+.audio-call-avatar img {
+    width: 120px;
+    height: 120px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    border: 3px solid white;
+
+    display: block;
+
+    margin: 0 auto 15px;
+}
+
+
+/* =========================================================
+   DARK MODE CALL UI
+========================================================= */
+
+body.dark .call-btn {
+    background: #374151;
+    color: white;
+}
+
+body.dark .call-btn:hover {
+    background: #4b5563;
+}
+
+body.dark .incoming-call {
+    background: #1f2937;
+    color: white;
+}
+
+body.dark .incoming-call p {
+    color: #9ca3af;
+}
+
+
+/* =========================================================
+   MOBILE CALL UI
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .chat-header {
+        gap: 7px;
+        padding: 7px 8px;
+    }
+
+    .chat-avatar {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+    }
+
+    .chat-header h3 {
+        font-size: 14px;
+    }
+
+    .chat-header p {
+        font-size: 11px;
+    }
+
+    .call-buttons {
+        gap: 5px;
+    }
+
+    .call-btn {
+        width: 36px;
+        height: 36px;
+        flex: 0 0 36px;
+        font-size: 16px;
+    }
+
+    .incoming-call {
+        width: calc(100% - 24px);
+        padding: 22px 16px;
+        border-radius: 18px;
+    }
+
+    .incoming-call-icon {
+        font-size: 48px;
+    }
+
+    .local-video {
+        width: 100px;
+        height: 145px;
+
+        top: 65px;
+        right: 10px;
+
+        border-radius: 12px;
+    }
+
+    .call-status {
+        top: 15px;
+        font-size: 13px;
+        max-width: 70%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .end-call-btn {
+        bottom: 25px;
+
+        width: 60px;
+        height: 60px;
+    }
+
+    .audio-call-avatar img {
+        width: 100px;
+        height: 100px;
+    }
+}
