@@ -28,6 +28,15 @@ app.use(
     notificationRoutes
 );
 
+// Push notification routes
+const pushRoutes =
+    require("./src/router/push.routes");
+
+app.use(
+    "/api/push",
+    pushRoutes
+);
+
 // Health Check Route
 app.get("/health", (req, res) => {
 
