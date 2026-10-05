@@ -11,7 +11,8 @@ const sendPushNotification = async ({
     userId,
     title,
     body,
-    url = "/messages"
+    url = "/messages",
+    data = {}
 }) => {
     try {
         const subscriptions = await PushSubscription.find({
@@ -19,7 +20,10 @@ const sendPushNotification = async ({
         });
 
         if (!subscriptions.length) {
-            console.log("⚠️ No push subscription for user:", userId);
+            console.log(
+                "⚠️ No push subscription for user:",
+                userId
+            );
             return;
         }
 
@@ -27,7 +31,13 @@ const sendPushNotification = async ({
             title,
             body,
             url,
-            tag: `message-${userId}`
+
+            tag:
+                data.type === "incoming-call"
+                    ? `incoming-call-${userId}`
+                    : `message-${userId}`,
+
+            data
         });
 
         for (const subscription of subscriptions) {
@@ -35,16 +45,24 @@ const sendPushNotification = async ({
                 await webpush.sendNotification(
                     {
                         endpoint: subscription.endpoint,
+
                         keys: {
-                            p256dh: subscription.keys.p256dh,
-                            auth: subscription.keys.auth
+                            p256dh:
+                                subscription.keys.p256dh,
+
+                            auth:
+                                subscription.keys.auth
                         }
                     },
                     payload
                 );
 
-                console.log("✅ Push notification sent");
+                console.log(
+                    "✅ Push notification sent"
+                );
+
             } catch (error) {
+
                 console.log(
                     "❌ Push send error:",
                     error.statusCode,
@@ -65,7 +83,9 @@ const sendPushNotification = async ({
                 }
             }
         }
+
     } catch (error) {
+
         console.log(
             "❌ Push notification system error:",
             error.message
