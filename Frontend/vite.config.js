@@ -9,6 +9,14 @@ export default defineConfig({
         VitePWA({
             registerType: "autoUpdate",
 
+            strategies: "injectManifest",
+
+            srcDir: "src",
+
+            filename: "sw.js",
+
+            injectRegister: "auto",
+
             manifest: {
                 name: "ORBIT",
                 short_name: "ORBIT",
