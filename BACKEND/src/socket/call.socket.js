@@ -1,425 +1,388 @@
 const {
     sendPushNotification
 } = require("../utils/pushNotification");
-
 const User = require("../model/user.model");
 
-
+// userId -> socketId
 const users = {};
 
-
 function callSocket(io) {
-
     io.on("connection", (socket) => {
-
         console.log(
             "📞 Call Socket Connected:",
             socket.id
         );
 
-
-        // =========================
-        // USER JOIN
-        // =========================
-
+        // =====================================================
+        // CALL JOIN
+        // =====================================================
         socket.on("call:join", (userId) => {
-
             if (!userId) return;
 
-
-            users[userId] = socket.id;
-
+            socket.data.userId = String(userId);
+            users[String(userId)] = socket.id;
 
             console.log(
                 "📞 Call user joined:",
-                userId,
+                String(userId),
                 socket.id
             );
 
+            console.log(
+                "👥 Active call users:",
+                Object.keys(users)
+            );
         });
 
-
-        // =========================
-        // START CALL
-        // =========================
-
-        socket.on("call:start", async (data) => {
-
-            try {
-
-                const {
-                    callerId,
-                    receiverId,
-                    callType
-                } = data;
-
-
-                const receiverSocket =
-                    users[receiverId];
-
-
-                console.log(
-                    "📞 Call Start:",
-                    {
+        // =====================================================
+        // CALL START
+        // =====================================================
+        socket.on(
+            "call:start",
+            async (data) => {
+                try {
+                    const {
                         callerId,
                         receiverId,
                         callType
+                    } = data || {};
+
+                    if (
+                        !callerId ||
+                        !receiverId
+                    ) {
+                        socket.emit(
+                            "call:user-offline",
+                            {
+                                pushSent: false,
+                                reason:
+                                    "INVALID_CALL_DATA"
+                            }
+                        );
+                        return;
                     }
-                );
 
+                    const receiverSocket =
+                        users[String(receiverId)];
 
-                // =========================
-                // RECEIVER ONLINE
-                // =========================
-
-                if (receiverSocket) {
-
-                    io.to(receiverSocket).emit(
-                        "call:incoming",
+                    console.log(
+                        "📞 CALL START:",
                         {
                             callerId,
                             receiverId,
-                            callType
+                            callType,
+                            receiverSocket:
+                                receiverSocket ||
+                                null
                         }
                     );
 
+                    // =================================================
+                    // RECEIVER ONLINE -> SOCKET CALL
+                    // =================================================
+                    if (receiverSocket) {
+                        io.to(receiverSocket).emit(
+                            "call:incoming",
+                            {
+                                callerId,
+                                receiverId,
+                                callType
+                            }
+                        );
 
-                    console.log(
-                        "📞 Incoming call sent through socket"
-                    );
+                        console.log(
+                            "📞 Incoming call sent through socket"
+                        );
 
-
-                    return;
-                }
-
-
-                // =========================
-                // RECEIVER OFFLINE
-                // =========================
-
-                console.log(
-                    "📴 Receiver offline. Sending push notification..."
-                );
-
-
-                let callerName = "Someone";
-
-
-                try {
-
-                    const caller =
-                        await User.findById(
-                            callerId
-                        ).select("username");
-
-
-                    if (caller?.username) {
-
-                        callerName =
-                            caller.username;
-
+                        return;
                     }
 
-                } catch (error) {
+                    // =================================================
+                    // RECEIVER OFFLINE -> WEB PUSH
+                    // =================================================
+                    console.log(
+                        "📴 Receiver socket offline. Sending push notification..."
+                    );
+
+                    let callerName =
+                        "Someone";
+
+                    try {
+                        const caller =
+                            await User.findById(
+                                callerId
+                            ).select(
+                                "username"
+                            );
+
+                        if (
+                            caller?.username
+                        ) {
+                            callerName =
+                                caller.username;
+                        }
+                    } catch (error) {
+                        console.log(
+                            "⚠️ Caller user lookup error:",
+                            error.message
+                        );
+                    }
+
+                    const normalizedCallType =
+                        callType === "video"
+                            ? "video"
+                            : "audio";
+
+                    const callTitle =
+                        normalizedCallType ===
+                        "video"
+                            ? "📹 Incoming video call"
+                            : "📞 Incoming call";
+
+                    const callBody =
+                        `${callerName} is calling you`;
+
+                    const pushResult =
+                        await sendPushNotification({
+                            userId: receiverId,
+                            title: callTitle,
+                            body: callBody,
+                            url: `/chat/${callerId}`,
+                            data: {
+                                type:
+                                    "incoming-call",
+                                callerId,
+                                receiverId,
+                                callType:
+                                    normalizedCallType
+                            }
+                        });
 
                     console.log(
-                        "⚠️ Caller user lookup error:",
+                        "🔔 Offline call push result:",
+                        pushResult
+                    );
+
+                    // IMPORTANT:
+                    // Do NOT end the caller's call if push was
+                    // successfully delivered. Keep caller screen
+                    // alive while receiver opens ORBIT.
+                    socket.emit(
+                        "call:user-offline",
+                        {
+                            receiverId,
+                            pushSent:
+                                Boolean(
+                                    pushResult?.sent
+                                )
+                        }
+                    );
+                } catch (error) {
+                    console.log(
+                        "❌ Call start error:",
                         error.message
                     );
 
+                    socket.emit(
+                        "call:user-offline",
+                        {
+                            pushSent: false,
+                            reason:
+                                "SERVER_ERROR"
+                        }
+                    );
                 }
+            }
+        );
 
+        // =====================================================
+        // CALL ACCEPT
+        // =====================================================
+        socket.on(
+            "call:accept",
+            (data) => {
+                const {
+                    callerId,
+                    receiverId
+                } = data || {};
 
-                const callTitle =
-                    callType === "video"
-                        ? "📹 Incoming video call"
-                        : "📞 Incoming call";
-
-
-                const callBody =
-                    `${callerName} is calling you`;
-
-
-                await sendPushNotification({
-
-                    userId: receiverId,
-
-                    title: callTitle,
-
-                    body: callBody,
-
-                    url: `/chat/${callerId}`,
-
-                    data: {
-
-                        type: "incoming-call",
-
-                        callerId,
-
-                        receiverId,
-
-                        callType
-
-                    }
-
-                });
-
-
-                // Tell caller that receiver is offline
-                socket.emit(
-                    "call:user-offline",
-                    {
-                        receiverId,
-                        pushSent: true
-                    }
-                );
-
-
-            } catch (error) {
+                const callerSocket =
+                    users[String(callerId)];
 
                 console.log(
-                    "❌ Call start error:",
-                    error.message
-                );
-
-
-                socket.emit(
-                    "call:user-offline",
-                    {
-                        pushSent: false
-                    }
-                );
-
-            }
-
-        });
-
-
-        // =========================
-        // ACCEPT CALL
-        // =========================
-
-        socket.on("call:accept", (data) => {
-
-            const {
-                callerId,
-                receiverId
-            } = data;
-
-
-            const callerSocket =
-                users[callerId];
-
-
-            if (callerSocket) {
-
-                io.to(callerSocket).emit(
-                    "call:accepted",
+                    "✅ CALL ACCEPT:",
                     {
                         callerId,
-                        receiverId
+                        receiverId,
+                        callerSocket:
+                            callerSocket || null
                     }
                 );
 
+                if (callerSocket) {
+                    io.to(callerSocket).emit(
+                        "call:accepted",
+                        {
+                            callerId,
+                            receiverId
+                        }
+                    );
+                }
             }
+        );
 
-        });
+        // =====================================================
+        // CALL REJECT
+        // =====================================================
+        socket.on(
+            "call:reject",
+            (data) => {
+                const {
+                    callerId,
+                    receiverId
+                } = data || {};
 
+                const callerSocket =
+                    users[String(callerId)];
 
-        // =========================
-        // REJECT CALL
-        // =========================
-
-        socket.on("call:reject", (data) => {
-
-            const {
-                callerId,
-                receiverId
-            } = data;
-
-
-            const callerSocket =
-                users[callerId];
-
-
-            if (callerSocket) {
-
-                io.to(callerSocket).emit(
-                    "call:rejected",
-                    {
-                        callerId,
-                        receiverId
-                    }
-                );
-
+                if (callerSocket) {
+                    io.to(callerSocket).emit(
+                        "call:rejected",
+                        {
+                            callerId,
+                            receiverId
+                        }
+                    );
+                }
             }
+        );
 
-        });
+        // =====================================================
+        // CALL END
+        // =====================================================
+        socket.on(
+            "call:end",
+            (data) => {
+                const {
+                    callerId,
+                    receiverId
+                } = data || {};
 
+                const socketUserId =
+                    socket.data.userId;
 
-        // =========================
-        // END CALL
-        // =========================
+                const otherUserId =
+                    String(socketUserId) ===
+                    String(callerId)
+                        ? receiverId
+                        : callerId;
 
-        socket.on("call:end", (data) => {
+                const otherSocket =
+                    users[String(otherUserId)];
 
-            const {
-                callerId,
-                receiverId
-            } = data;
-
-
-            const otherUserId =
-                socket.id === users[callerId]
-                    ? receiverId
-                    : callerId;
-
-
-            const otherSocket =
-                users[otherUserId];
-
-
-            if (otherSocket) {
-
-                io.to(otherSocket).emit(
-                    "call:ended"
-                );
-
+                if (otherSocket) {
+                    io.to(otherSocket).emit(
+                        "call:ended"
+                    );
+                }
             }
+        );
 
-        });
-
-
-        // =========================
+        // =====================================================
         // WEBRTC OFFER
-        // =========================
-
+        // =====================================================
         socket.on(
             "call:offer",
             ({ receiverId, offer }) => {
-
                 const receiverSocket =
-                    users[receiverId];
-
+                    users[String(receiverId)];
 
                 if (receiverSocket) {
-
                     io.to(receiverSocket).emit(
                         "call:offer",
                         {
                             offer,
-
                             senderId:
-                                Object.keys(users).find(
-                                    id =>
-                                        users[id] ===
-                                        socket.id
-                                )
+                                socket.data
+                                    .userId
                         }
                     );
-
                 }
-
             }
         );
 
-
-        // =========================
+        // =====================================================
         // WEBRTC ANSWER
-        // =========================
-
+        // =====================================================
         socket.on(
             "call:answer",
             ({ receiverId, answer }) => {
-
                 const receiverSocket =
-                    users[receiverId];
-
+                    users[String(receiverId)];
 
                 if (receiverSocket) {
-
                     io.to(receiverSocket).emit(
                         "call:answer",
                         {
                             answer,
-
                             senderId:
-                                Object.keys(users).find(
-                                    id =>
-                                        users[id] ===
-                                        socket.id
-                                )
+                                socket.data
+                                    .userId
                         }
                     );
-
                 }
-
             }
         );
 
-
-        // =========================
-        // WEBRTC ICE CANDIDATE
-        // =========================
-
+        // =====================================================
+        // ICE CANDIDATE
+        // =====================================================
         socket.on(
             "call:ice-candidate",
             ({ receiverId, candidate }) => {
-
                 const receiverSocket =
-                    users[receiverId];
-
+                    users[String(receiverId)];
 
                 if (receiverSocket) {
-
                     io.to(receiverSocket).emit(
                         "call:ice-candidate",
                         {
-                            candidate
+                            candidate,
+                            senderId:
+                                socket.data
+                                    .userId
                         }
                     );
-
                 }
-
             }
         );
 
-
-        // =========================
+        // =====================================================
         // DISCONNECT
-        // =========================
-
+        // =====================================================
         socket.on("disconnect", () => {
+            const userId =
+                socket.data.userId;
 
-            for (
-                const userId in users
-            ) {
-
-                if (
-                    users[userId] ===
+            if (
+                userId &&
+                users[String(userId)] ===
                     socket.id
-                ) {
+            ) {
+                delete users[String(userId)];
 
-                    delete users[userId];
-
-
-                    console.log(
-                        "📴 Call user disconnected:",
-                        userId
-                    );
-
-
-                    break;
-
-                }
-
+                console.log(
+                    "📴 Call user disconnected:",
+                    String(userId)
+                );
             }
 
+            console.log(
+                "👥 Active call users after disconnect:",
+                Object.keys(users)
+            );
         });
-
     });
-
 }
-
 
 module.exports = callSocket;

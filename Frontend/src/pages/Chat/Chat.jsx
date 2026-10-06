@@ -816,6 +816,78 @@ function Chat() {
         }
 
         // =================================================
+        // RESTORE INCOMING CALL FROM PUSH NOTIFICATION
+        // =================================================
+
+        // When the browser/app was closed, Web Push opens this
+        // chat URL. We restore the incoming-call screen from the
+        // URL parameters so the receiver can Accept/Reject.
+        try {
+            const params = new URLSearchParams(
+                window.location.search
+            );
+
+            const incomingCall =
+                params.get("incomingCall");
+
+            const pushCallerId =
+                params.get("callerId");
+
+            const pushCallType =
+                params.get("callType");
+
+            if (
+                incomingCall === "1" &&
+                pushCallerId
+            ) {
+                const restoredCallType =
+                    pushCallType === "video"
+                        ? "video"
+                        : "audio";
+
+                console.log(
+                    "🔔 RESTORING CALL FROM PUSH:",
+                    {
+                        callerId: pushCallerId,
+                        callType: restoredCallType
+                    }
+                );
+
+                setCallerId(
+                    pushCallerId
+                );
+
+                setCallType(
+                    restoredCallType
+                );
+
+                setCallIncoming(true);
+
+                setCallStatus(
+                    "Incoming call..."
+                );
+
+                // Browser may block autoplay audio after a
+                // notification click. The Accept button will
+                // still work and stopRingtone() is safe.
+                playRingtone();
+
+                // Remove the query parameters so refresh does
+                // not create the same incoming call again.
+                window.history.replaceState(
+                    {},
+                    document.title,
+                    `/chat/${pushCallerId}`
+                );
+            }
+        } catch (error) {
+            console.log(
+                "❌ PUSH CALL RESTORE ERROR:",
+                error
+            );
+        }
+
+        // =================================================
         // JOIN CHAT SOCKET
         // =================================================
 
@@ -1095,21 +1167,44 @@ function Chat() {
             };
 
         // =================================================
-        // USER OFFLINE
+        // USER OFFLINE / PUSH CALL WAITING
         // =================================================
 
         const handleUserOffline =
-            () => {
+            (data = {}) => {
                 console.log(
-                    "📴 USER OFFLINE"
+                    "📴 RECEIVER SOCKET OFFLINE:",
+                    data
+                );
+
+                // IMPORTANT:
+                // Receiver Socket.IO offline does NOT mean
+                // receiver has no internet. Backend may have
+                // successfully sent a Web Push notification.
+                // Keep the caller screen alive and wait for the
+                // receiver to open ORBIT from the notification.
+                if (data?.pushSent) {
+                    setCallStatus(
+                        "Waiting for receiver..."
+                    );
+
+                    console.log(
+                        "🔔 PUSH SENT - WAITING FOR RECEIVER"
+                    );
+
+                    return;
+                }
+
+                // If push was not sent, keep the old fallback.
+                console.log(
+                    "❌ PUSH WAS NOT SENT"
                 );
 
                 stopRingtone();
-
                 endCall(false);
 
                 alert(
-                    "User is offline."
+                    "Unable to notify the user."
                 );
             };
 
