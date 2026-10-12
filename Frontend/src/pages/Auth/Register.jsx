@@ -1,12 +1,18 @@
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import "./Register.css";
 
+const BASE_URL =
+    import.meta.env.VITE_API_URL ||
+    "https://orbit-backend-94nx.onrender.com";
+
 function Register() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
@@ -14,47 +20,81 @@ function Register() {
         const token = localStorage.getItem("token");
 
         if (token) {
-            navigate("/");
+            navigate("/", { replace: true });
         }
     }, [navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (loading) return;
+
+        const cleanUsername = username.trim();
+        const cleanEmail = email.trim();
+
+        if (!cleanUsername || !cleanEmail || !password) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        if (password.length < 6) {
+            alert("Password must be at least 6 characters long.");
+            return;
+        }
+
         try {
-            // ✅ Clean & Corrected URL
-            const BASE_URL = import.meta.env.VITE_API_URL || "https://orbit-backend-94nx.onrender.com";
+            setLoading(true);
 
             const response = await axios.post(
                 `${BASE_URL}/api/auth/register`,
                 {
-                    username,
-                    email,
-                    password
+                    username: cleanUsername,
+                    email: cleanEmail,
+                    password,
                 },
                 {
-                    withCredentials: true
+                    withCredentials: true,
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
                 }
             );
 
             console.log("Register Response:", response.data);
-            alert("Account created successfully! Please login to continue.");
-            navigate("/login");
+
+            alert("Account created successfully! Please login.");
+            navigate("/login", { replace: true });
 
         } catch (error) {
-            console.log(
+            console.error(
+                "Registration error:",
+                error.response?.status,
                 error.response?.data || error.message
             );
-            alert(error.response?.data?.message || "Registration failed!");
+
+            const status = error.response?.status;
+            const message = error.response?.data?.message;
+
+            if (!error.response) {
+                alert(
+                    "Cannot connect to the server. Please check your internet connection and try again."
+                );
+            } else if (status === 409) {
+                alert(message || "Username or email already exists.");
+            } else if (status === 400) {
+                alert(message || "Please check your registration details.");
+            } else {
+                alert(message || `Registration failed (${status}).`);
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="register-container">
             <div className="register-card">
-                <div className="register-logo">
-                    Orbit
-                </div>
+                <div className="register-logo">Orbit</div>
 
                 <h1>Create Account</h1>
 
@@ -68,7 +108,11 @@ function Register() {
                         placeholder="Username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                        autoComplete="username"
+                        minLength={3}
+                        maxLength={30}
                         required
+                        disabled={loading}
                     />
 
                     <input
@@ -76,30 +120,34 @@ function Register() {
                         placeholder="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        autoComplete="email"
                         required
+                        disabled={loading}
                     />
 
                     <input
                         type="password"
-                        placeholder="Password"
+                        placeholder="Password (minimum 6 characters)"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        autoComplete="new-password"
+                        minLength={6}
                         required
+                        disabled={loading}
                     />
 
                     <button
                         className="register-btn"
                         type="submit"
+                        disabled={loading}
                     >
-                        Create Account
+                        {loading ? "Creating Account..." : "Create Account"}
                     </button>
                 </form>
 
                 <div className="login-link">
                     Already have an account?{" "}
-                    <Link to="/login">
-                        Login
-                    </Link>
+                    <Link to="/login">Login</Link>
                 </div>
             </div>
         </div>
